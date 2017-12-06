@@ -1,0 +1,14 @@
+{
+  "name": "setup",
+  "version": "1.0.0",
+  "description": "collection of setup scripts",
+  "main": "js/setup.js",
+  "repository": "git@github.com:arlimus/setup.git",
+  "author": "Dominik Richter",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^2.3.0",
+    "inquirer": "^4.0.1",
+    "shelljs": "^0.7.8"
+  }
+}

@@ -1,0 +1,141 @@
+# git config; arlimus, public domain
+
+## Make your adjustments
+########################
+
+[user]
+name = Your Name
+email = your.name@email.com
+
+[core]
+# excludesfile = /home/xxx/.gitignore-global
+pager = less -FRX
+editor = vim
+
+# # in case your firewall is blocking git://, use https:// instead
+# [url "https://"]
+#  insteadOf = git://
+#
+# # Example:
+# [url "git@github.com:"]
+# insteadOf = https://github.com/
+
+## in case you push to unverifyable https, disable verification
+# [http]
+# sslVerify=false
+
+
+## Global configuration
+#######################
+
+[alias]
+a  = add --all
+ap = add -p
+au = add --update
+
+b  = branch
+ba = branch -a
+
+bi = bisect
+cl = clone
+co = checkout
+com = !git checkout "$(git rev-list HEAD --max-count 1)" && git branch -d master && git checkout master
+corm = !git checkout $1 && git rebase origin/master
+cofm = !git fetch --all --prune && git checkout $1 && git rebase origin/master
+codm = !NAME=$(git rev-parse --abbrev-ref HEAD) && test -n "$NAME" && git fetch --all --prune && git checkout master && git pull && git branch -d "$NAME"
+
+d  = diff --color
+dc = diff --color --cached
+dd = difftool --dir-diff
+
+f  = fetch
+fa = fetch --all --prune
+# fetch a github branch; usage: git feb https://github.com/user/proj/pull/1234
+feb = !REFI="$(echo $1)" && PULL_ID="$(echo $REFI | sed 's_.*/__' | tr -d '[[:space:]]')" && BRANCH="pr/$PULL_ID" && git fetch origin pull/$PULL_ID/head:$BRANCH && sleep 1 && git checkout $BRANCH && echo "You are on $BRANCH from "
+# Not working, todo: ghco = "!f(){ URL=\"$1\"; NAME=\"$2\"; B=\"$(echo $URL | grep --color=never -o 'pull/[^/]*')/head:$NAME\"; git fetch origin $B; git checkout $NAME}; f"
+
+c     = commit -s
+cc    = commit --amend
+cm    = commit -m
+ca    = commit -a -s
+cam   = commit -a -s -m
+cp    = commit -s -p
+cs    = commit -s -m
+
+# show commit graph
+l     = log --color --oneline --graph --decorate=short --all --simplify-by-decoration
+ll    = log --color --oneline --graph --decorate=short --all
+# show merged commit graph
+lm    = log --color --format="%C(green)%s%C(yellow)%d%Creset%n%b" --graph --decorate=short --merges
+lam   = log --color --format="%C(green)%s%C(yellow)%d%Creset%n%b" --graph --decorate=short --merges --all
+# show diffs and commit names
+ld    = log --color --decorate=short -p
+lad   = log --color --decorate=short -p --all
+# show just the diffs for commits
+lp    = log --color --oneline --decorate=short -p
+lap   = log --color --oneline --decorate=short -p --all
+# show commit graph with commit names and logs
+lt    = log --color --graph --decorate=short --all --simplify-by-decoration
+llt   = log --color --graph --decorate=short --all
+lls   = log --color --graph --decorate=short --all --stat
+# show commit graph with files that were changed
+lf    = log --color --oneline --graph --decorate=short --name-only
+laf   = log --color --oneline --graph --decorate=short --name-only --all
+
+m  = merge --no-ff
+mf = merge --ff-only
+
+p  = push
+pa = push --all
+pt = push --tags
+po = push -u origin
+pu = push -u origin --force-with-lease
+
+pl = pull
+pla= pull --all
+
+rpa = remote prune --dry-run
+rp = remote prune
+
+r  = reset
+ri = rebase -i
+rim= rebase -i master
+rio= rebase -i origin/master
+rsh= reset --soft HEAD
+rhh= reset --hard HEAD
+
+s  = status --short
+ss = status
+
+t  = tag
+
+[apply]
+whitespace = fix
+
+[pager]
+status = true
+
+[merge]
+tool = meld
+
+[mergetool "meld"]
+trustExitCode = true
+
+[push]
+default = matching
+
+[color]
+ui = auto
+
+[giggle]
+main-window-maximized = true
+main-window-geometry = 0x0+0+0
+history-view-vpane-position = 293
+main-window-view = HistoryView
+file-view-vpane-position = 530
+
+# Helpful to remember:
+# * create a patch
+#   git format-patch origin/master..HEAD --stdout > update.patch
+# * apply a patch
+#   git am --signoff < update.patch 
