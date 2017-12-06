@@ -38,6 +38,14 @@ const syncFile = (src, dst) => {
   console.log(`${srcp} -> ${dst}`)
   return shell.cp(srcp, dst)
 }
+const syncFiles = (src, dst) => {
+  srcp = path.join('files', src);
+  if(!fs.existsSync(srcp))
+    return console.log(colorErr(`Cannot find source file in ${srcp}`))
+  console.log(`${srcp} -> ${dst}`)
+  shell.mkdir('-p', path.dirname(dst))
+  return shell.cp('-R', srcp, dst)
+}
 
 // Brew
 const installBrew = () => run('/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"')
@@ -72,3 +80,8 @@ const installGitconf = () => {
 }
 install('gitconfig', () => false, installGitconf)
 
+// Vim config
+const vimrcPath = path.join(os.homedir(), '.vimrc')
+const installVimrc = () => syncFile('vimrc', vimrcPath)
+const installColors = () => syncFiles('vimcolors', path.join(os.homedir(), '.vim/colors'))
+install('vimrc', () => false, () => installVimrc() && installColors())
