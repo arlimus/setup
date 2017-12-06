@@ -1,0 +1,31 @@
+#!/bin/bash
+
+echo "1. Install XCode foundation"
+xcode-select --install | echo "xcode installed"
+
+echo "2. Install NVM"
+export NVM_DIR="$HOME/.nvm"
+
+function install_nvm() {
+	git clone https://github.com/creationix/nvm.git "$NVM_DIR"
+	pushd "$NVM_DIR"
+	git fetch --all
+	NVM_VER="$(git tag | sort -V | tail -n1)"
+	echo "NVM version $NVM_VER"
+	git checkout "$NVM_VER"
+	popd
+}
+
+test ! -d "$NVM_DIR" && install_nvm
+test ! -d "$NVM_DIR" && exit 1
+
+source "$NVM_DIR/nvm.sh"
+command -v node || nvm install stable
+node --version
+
+echo "3. Install requirements"
+command -v yarn || sudo npm install -g yarn
+yarn
+
+echo "Ready to go with the actual setup..."
+command -v node && node js/setup.js
