@@ -25,27 +25,35 @@ const gitEnsure = (src, path) => {
   return run(`cd ${path} && git fetch --all && git pull`)
 }
 
-const brewInstall = x => {
-  res = run(`brew install ${x}`)
+const installRun = (cmd, list) => {
+  res = run(cmd)
   if(res.status == 0) {
-    console.log(colorOk(`Installation of ${x} successful`));
+    console.log(colorOk(`Installation ${list} successful`));
     return true;
   }
-  console.log(colorErr(`Failed to install ${x}: ${res.stderr}`));
+  console.log(colorErr(`Failed to install ${list}: ${res.stderr}`));
   return false;
 }
+const brewInstall = x => installRun(`brew install ${x.join(' ')}`, x)
+const yaourtInstall = (...x) => installRun(`yaourt -S --needed --noconfirm ${x.join(' ')}`, x)
 const isOsx = /^darwin/.test(process.platform)
+const isArch = process.platform == 'linux' && fs.existsSync('/usr/bin/yaourt') 
 const cannotInstall = x =>
   console.log(colorErr(`Cannot detect OS to install ${x}`)) &&
   shell.exit(1)
-const packageInstall = x =>
-  isOsx ? brewInstall(x) :
-  cannotInstall(x)
+const package = 
+  isOsx ? brewInstall :
+  isArch ? yaourtInstall :
+  cannotInstall
 
-const install = (what, exists, install) => {
+const install = (what, exists, installF) => {
   if(exists()) return console.log(colorOk(`[ok] ${what}`));
-  return install()
+  return installF()
 }
+const installCmd = (what, test = null) =>
+  (test == null) ? installCmd(what, () => commandExists(what)) :
+  (typeof test === 'string') ? installCmd(what, () => commandExists(test)) :
+  install(what, test, () => package(what))
 const syncFile = (src, dst) => {
   srcp = path.join('files', src);
   if(!fs.existsSync(srcp))
@@ -62,27 +70,47 @@ const syncFiles = (src, dst) => {
   return shell.cp('-R', srcp, dst)
 }
 
-// Brew
-const installBrew = () => run('/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"')
-install('brew', () => commandExists('brew'), installBrew)
+// OSX
+function installOsxPackages() {
+  install('brew', () => commandExists('brew'), () => run(
+    '/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"'
+  ))
+  installCmd('ag')
+  installCmd('zsh')
+  installCmd('the_silver_searcher', 'ag')
+}
+if(isOsx) { installOsxPackages() }
 
-// AG
-const installAg = () => packageInstall('ag')
-install('ag', () => commandExists('ag'), installAg)
+// Arch
+function installArchPackages() {
+  package(
+    'git', 'vim', 'vim-surround', 'curl',
+    'i3', 'xfce4-terminal', 'terminator', 'compton',
+    'gnome-settings-daemon', 'feh', 'udiskie',
+    'xorg', 'xorg-xrandr', 'lightdm', 'lightdm-deepin-greeter',
+    'zsh', 'the_silver_searcher',
+  )
+}
+if(isArch) { installArchPackages() }
 
 // ZSH
 const zshrc = path.join(os.homedir(), '.zshrc')
-const installZsh = () => packageInstall('zsh')
-install('zsh', () => commandExists('zsh'), installZsh)
 const defaultZsh = () => run('chsh -s /bin/zsh')
-install('zsh-default', () => process.env.SHELL == '/bin/zsh', defaultZsh)
+//install('zsh-default', () => process.env.SHELL == '/bin/zsh', defaultZsh)
 const installOhMyZsh = () => {
   gitEnsure('git://github.com/robbyrussell/oh-my-zsh.git', path.join(os.homedir(), '.oh-my-zsh'))
   if(!fs.existsSync(zshrc))
-    shell.cp(`~/.oh-my-zsh/templates/zshrc.zsh-template ${zshrc}`)
+    shell.cp("~/.oh-my-zsh/templates/zshrc.zsh-template", zshrc)
   return run('curl https://raw.githubusercontent.com/arlimus/zero.zsh/master/bootstrap.sh | sh -')
 }
 install('oh-my-zsh', () => false, installOhMyZsh)
+const configureZshrc = () => {
+  c = fs.readFileSync(zshrc)
+  c = c.replace(/ZSH_THEME=.*/, 'ZSH_THEME="zero-dark"')
+  c = c.replace(/plugins=\((.+[\s\S])+\)/, 'plugins=(git zero)')
+  fs.writeFileSync(zshrc, c)
+}
+configureZshrc()
 
 // Gitconfig
 const gitconfPath = path.join(os.homedir(), '.gitconfig')
