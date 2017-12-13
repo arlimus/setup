@@ -96,7 +96,7 @@ const resolution = '1920x1200'
 function installArchPackages() {
   package(
     // basics
-    'git', 'vim', 'vim-surround', 'curl', 'openssh',
+    'git', 'vim', 'vim-surround', 'curl', 'openssh', 'networkmanager', 'network-manager-applet',
     // deps for parallels tools
     'base-devel', 'python2', 'linux-headers',
     // ui basics
