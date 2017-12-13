@@ -102,6 +102,7 @@ function installArchPackages() {
     'base-devel', 'python2', 'linux-headers',
     // ui basics
     'xorg', 'xf86-video-vesa', 'mesa-libgl', 'lightdm', 'lightdm-deepin-greeter',
+    'ttf-inconsolata',
     // i3
     'i3', 'xfce4-terminal', 'terminator', 'compton', 'dmenu',
     'gnome-settings-daemon', 'feh', 'udiskie',

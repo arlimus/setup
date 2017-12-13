@@ -26,4 +26,6 @@ MiscUseShiftArrowsToScroll=FALSE
 MiscSlimTabs=FALSE
 BackgroundMode=TERMINAL_BACKGROUND_TRANSPARENT
 ScrollingBar=TERMINAL_SCROLLBAR_NONE
+FontName=Inconsolata 16
+BackgroundDarkness=0.750000
 
