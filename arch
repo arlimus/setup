@@ -6,11 +6,12 @@ if [ "$EUID" -eq "0" ]; then
 fi
 
 sudo echo "[ok] sudo works" || exit 1
+LOC="$(pwd)"
 
 install_yaourt() {
   echo "====> Install yaourt"
   echo "----> 1/3 install requirements"
-  sudo pacman -S --noconfirm base-devel
+  sudo pacman -S --needed --noconfirm base-devel
 
   echo "----> 2/3 aur package-query"
   dir="/tmp/package-query"
@@ -27,6 +28,7 @@ install_yaourt() {
   tar -xvzf yaourt.tar.gz 
   cd yaourt
   makepkg --noconfirm -si
+  cd "$LOC"
 }
 if command -v yaourt > /dev/null; then
   echo "[ok] yaourt is installed"
