@@ -84,12 +84,30 @@ if(isOsx) { installOsxPackages() }
 // Arch
 function installArchPackages() {
   package(
-    'git', 'vim', 'vim-surround', 'curl',
-    'i3', 'xfce4-terminal', 'terminator', 'compton',
+    // basics
+    'git', 'vim', 'vim-surround', 'curl', 'openssh',
+    // deps for parallels tools
+    'base-devel', 'python2', 'linux-headers',
+    // ui basics
+    'xorg-server', 'xorg-xinit', 'xorg-server-utils', 'xorg-xrandr',
+    'xf86-video-vesa', 'mesa-libgl', 'lightdm', 'lightdm-deepin-greeter',
+    // i3
+    'i3', 'xfce4-terminal', 'terminator', 'compton', 'dmenu',
     'gnome-settings-daemon', 'feh', 'udiskie',
-    'xorg', 'xorg-xrandr', 'lightdm', 'lightdm-deepin-greeter',
+    // web
+    'firefox', 'chromium',
+    // cli tools
     'zsh', 'the_silver_searcher',
   )
+
+  run('sudo ln -sf /usr/lib/systemd/scripts/ /etc/init.d')
+  run('sudo touch /etc/X11/xorg.conf')
+  run('sudo ln -sf /usr/bin/python2 /usr/local/bin/python')
+
+  installParallelsTools = () => {
+    console.log("Please install parallels tools manually!")
+  }
+  install('parallels-tools', () => fs.existsSync('/usr/lib/parallels-tools/version'), installParallelsTools())
 }
 if(isArch) { installArchPackages() }
 
