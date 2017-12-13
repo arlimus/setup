@@ -96,13 +96,12 @@ const resolution = '1920x1200'
 function installArchPackages() {
   package(
     // basics
-    'git', 'vim', 'vim-surround', 'curl', 'colordiff',
+    'git', 'vim', 'vim-surround', 'curl', 'colordiff', 'htop',
     'openssh', 'networkmanager', 'network-manager-applet',
     // deps for parallels tools
     'base-devel', 'python2', 'linux-headers',
     // ui basics
-    'xorg-server', 'xorg-xinit', 'xorg-xrandr',
-    'xf86-video-vesa', 'mesa-libgl', 'lightdm', 'lightdm-deepin-greeter',
+    'xorg', 'xf86-video-vesa', 'mesa-libgl', 'lightdm', 'lightdm-deepin-greeter',
     // i3
     'i3', 'xfce4-terminal', 'terminator', 'compton', 'dmenu',
     'gnome-settings-daemon', 'feh', 'udiskie',
