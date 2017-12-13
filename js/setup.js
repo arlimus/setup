@@ -96,7 +96,8 @@ const resolution = '1920x1200'
 function installArchPackages() {
   package(
     // basics
-    'git', 'vim', 'vim-surround', 'curl', 'openssh', 'networkmanager', 'network-manager-applet',
+    'git', 'vim', 'vim-surround', 'curl', 'colordiff',
+    'openssh', 'networkmanager', 'network-manager-applet',
     // deps for parallels tools
     'base-devel', 'python2', 'linux-headers',
     // ui basics
@@ -120,7 +121,7 @@ function installArchPackages() {
     run(`sudo mv /tmp/lightdmconf ${p}`)
   }
   install('configure lightdm', false, configureLightdm)
-
+  run('sudo systemctl enable NetworkManager')
 
   run('sudo ln -sf /usr/lib/systemd/scripts/ /etc/init.d')
   run('sudo touch /etc/X11/xorg.conf')
