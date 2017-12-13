@@ -92,6 +92,7 @@ function installOsxPackages() {
 if(isOsx) { installOsxPackages() }
 
 // Arch
+const resolution = '1920x1200'
 function installArchPackages() {
   package(
     // basics
@@ -99,7 +100,7 @@ function installArchPackages() {
     // deps for parallels tools
     'base-devel', 'python2', 'linux-headers',
     // ui basics
-    'xorg-server', 'xorg-xinit', 'xorg-server-utils', 'xorg-xrandr',
+    'xorg-server', 'xorg-xinit', 'xorg-xrandr',
     'xf86-video-vesa', 'mesa-libgl', 'lightdm', 'lightdm-deepin-greeter',
     // i3
     'i3', 'xfce4-terminal', 'terminator', 'compton', 'dmenu',
@@ -114,6 +115,7 @@ function installArchPackages() {
     p = '/etc/lightdm/lightdm.conf'
     c = fs.readFileSync(p, 'utf-8')
     c = c.replace(/^#?greeter-session=.*/m, 'greeter-session=lightdm-deepin-greeter')
+    c = c.replace(/^#?display-setup-script=.*/m, `display-setup-script=xrandr --output default --mode ${resolution}`)
     fs.writeFileSync('/tmp/lightdmconf', c)
     run(`sudo mv /tmp/lightdmconf ${p}`)
   }
@@ -127,6 +129,12 @@ function installArchPackages() {
     console.error("Please install parallels tools manually!")
   }
   install('parallels-tools', () => fs.existsSync('/usr/lib/parallels-tools/version'), () => installParallelsTools())
+
+  const configureI3 = () => syncFiles('i3.config', path.join(os.homedir(), '.i3/config'))
+  install('i3-config', false, configureI3)
+
+  const configureTerm = () => syncFiles('xfce4terminal.rc', path.join(os.homedir(), '.config/xfce4/terminal/terminalrc'))
+  install('xfce4-terminal', false, configureTerm)
 }
 if(isArch) { installArchPackages() }
 
