@@ -6,16 +6,20 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const process = require('process');
 
-const colorCmd = chalk.blue
-const colorOk = chalk.green
-const colorErr = chalk.red
-const colorInfo = chalk.cyan
+const color = {
+  cmd: chalk.blue,
+  ok: chalk.green,
+  err: chalk.red,
+  info: chalk.cyan,
+}
 const print = {
-  ok: x => console.log(colorOk('[ok] '+x)),
-  err: x => console.log(colorErr(x)),
-  cmd: x => console.log(colorCmd(x)),
-  info: x => console.log(colorInfo(x)),
+  ok: x => console.log(color.ok('[ok] '+x)),
+  err: x => console.log(color.err(x)),
+  fatal: x => { console.log(color.err(x)); process.exit(1) },
+  cmd: x => console.log(color.cmd(x)),
+  info: x => console.log(color.info(x)),
 }
 
 const runq = x => spawnSync('bash', ['-c', x])
