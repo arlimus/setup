@@ -11,10 +11,16 @@ const colorCmd = chalk.blue
 const colorOk = chalk.green
 const colorErr = chalk.red
 const colorInfo = chalk.cyan
+const print = {
+  ok: x => console.log(colorOk('[ok] '+x)),
+  err: x => console.log(colorErr(x)),
+  cmd: x => console.log(colorCmd(x)),
+  info: x => console.log(colorInfo(x)),
+}
 
 const runq = x => spawnSync('bash', ['-c', x])
 const run = x => {
-  console.log(colorCmd(`----> ${x}`))
+  print.cmd(`----> ${x}`)
   return shell.exec(x)
 }
 const commandExists = x => spawnSync('command',['-v', x]).status == 0
@@ -28,10 +34,10 @@ const gitEnsure = (src, path) => {
 const installRun = (cmd, list) => {
   res = run(cmd)
   if(res.status == 0) {
-    console.log(colorOk(`Installation ${list} successful`));
+    print.ok(`Installation ${list} successful`);
     return true;
   }
-  console.log(colorErr(`Failed to install ${list}: ${res.stderr}`));
+  print.err(`Failed to install ${list}: ${res.stderr}`);
   return false;
 }
 const brewInstall = x => installRun(`brew install ${x.join(' ')}`, x)
@@ -39,7 +45,7 @@ const yaourtInstall = (...x) => installRun(`yaourt -S --needed --noconfirm ${x.j
 const isOsx = /^darwin/.test(process.platform)
 const isArch = process.platform == 'linux' && fs.existsSync('/usr/bin/yaourt') 
 const cannotInstall = x =>
-  console.log(colorErr(`Cannot detect OS to install ${x}`)) &&
+  print.err(`Cannot detect OS to install ${x}`) &&
   shell.exit(1)
 const package = 
   isOsx ? brewInstall :
@@ -47,8 +53,8 @@ const package =
   cannotInstall
 
 const install = (what, exists, installF) => {
-  if(exists()) return console.log(colorOk(`[ok] ${what}`));
-  return installF()
+  if(exists === false || !exists()) installF()
+  print.ok(`${what}`);
 }
 const installCmd = (what, test = null) =>
   (test == null) ? installCmd(what, () => commandExists(what)) :
@@ -57,14 +63,14 @@ const installCmd = (what, test = null) =>
 const syncFile = (src, dst) => {
   srcp = path.join('files', src);
   if(!fs.existsSync(srcp))
-    return console.log(colorErr(`Cannot find source file in ${srcp}`))
+    return print.err(`Cannot find source file in ${srcp}`)
   console.log(`${srcp} -> ${dst}`)
   return shell.cp(srcp, dst)
 }
 const syncFiles = (src, dst) => {
   srcp = path.join('files', src);
   if(!fs.existsSync(srcp))
-    return console.log(colorErr(`Cannot find source file in ${srcp}`))
+    return print.err(`Cannot find source file in ${srcp}`)
   console.log(`${srcp} -> ${dst}`)
   shell.mkdir('-p', path.dirname(dst))
   return shell.cp('-R', srcp, dst)
@@ -100,14 +106,23 @@ function installArchPackages() {
     'zsh', 'the_silver_searcher',
   )
 
+  configureLightdm = () => {
+    p = '/etc/lightdm/lightdm.conf'
+    c = fs.readFileSync(p, 'utf-8')
+    c = c.replace(/^#?greeter-session=.*/m, 'greeter-session=lightdm-deepin-greeter')
+    fs.writeFileSync('/tmp/lightdmconf', c)
+    run(`sudo mv /tmp/lightdmconf ${p}`)
+  }
+  install('configure lightdm', false, configureLightdm)
+
+
   run('sudo ln -sf /usr/lib/systemd/scripts/ /etc/init.d')
   run('sudo touch /etc/X11/xorg.conf')
   run('sudo ln -sf /usr/bin/python2 /usr/local/bin/python')
-
   installParallelsTools = () => {
-    console.log("Please install parallels tools manually!")
+    console.error("Please install parallels tools manually!")
   }
-  install('parallels-tools', () => fs.existsSync('/usr/lib/parallels-tools/version'), installParallelsTools())
+  install('parallels-tools', () => fs.existsSync('/usr/lib/parallels-tools/version'), () => installParallelsTools())
 }
 if(isArch) { installArchPackages() }
 
@@ -121,9 +136,9 @@ const installOhMyZsh = () => {
     shell.cp("~/.oh-my-zsh/templates/zshrc.zsh-template", zshrc)
   return run('curl https://raw.githubusercontent.com/arlimus/zero.zsh/master/bootstrap.sh | sh -')
 }
-install('oh-my-zsh', () => false, installOhMyZsh)
+install('oh-my-zsh', false, installOhMyZsh)
 const configureZshrc = () => {
-  c = fs.readFileSync(zshrc)
+  c = fs.readFileSync(zshrc, 'utf-8')
   c = c.replace(/ZSH_THEME=.*/, 'ZSH_THEME="zero-dark"')
   c = c.replace(/plugins=\((.+[\s\S])+\)/, 'plugins=(git zero)')
   fs.writeFileSync(zshrc, c)
@@ -137,7 +152,7 @@ const gitconfSet = x => {
   run(`git config --global user.email "${x.email}"`)
 }
 const gitconfSettings = () => {
-  console.log(colorInfo('configure global git settings'))
+  print.info('configure global git settings')
   q = [
     { type: 'input', name: 'name', message: 'What is your name' },
     { type: 'input', name: 'email', message: 'What is your email' },
@@ -153,10 +168,10 @@ const installGitconf = () => {
   if(o.name == '' || o.name == 'Your Name' || o.email == '') gitconfSettings()
   else gitconfSet(o);
 }
-install('gitconfig', () => false, installGitconf)
+install('gitconfig', false, installGitconf)
 
 // Vim config
 const vimrcPath = path.join(os.homedir(), '.vimrc')
 const installVimrc = () => syncFile('vimrc', vimrcPath)
 const installColors = () => syncFiles('vimcolors', path.join(os.homedir(), '.vim/colors'))
-install('vimrc', () => false, () => installVimrc() && installColors())
+install('vimrc', false, () => installVimrc() && installColors())
