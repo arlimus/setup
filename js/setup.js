@@ -134,6 +134,9 @@ function installArchPackages() {
   const configureI3 = () => syncFiles('i3.config', path.join(os.homedir(), '.i3/config'))
   install('i3-config', false, configureI3)
 
+  const configureCompton = () => syncFiles('compton.conf', path.join(os.homedir(), '.config/compton.conf'))
+  install('compton conf', false, configureCompton)
+
   const configureTerm = () => syncFiles('xfce4terminal.rc', path.join(os.homedir(), '.config/xfce4/terminal/terminalrc'))
   install('xfce4-terminal', false, configureTerm)
 }
