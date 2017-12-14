@@ -213,6 +213,8 @@ const configureZshrc = () => {
   c = c.replace(/plugins=\((.+[\s\S])+\)/, 'plugins=(git zero)')
   ensure = x => { if(!c.includes(x)) c += "\n"+x; }
   ensure('PATH=$HOME/.gem/ruby/2.4.0/bin:$PATH')
+  ensure('export GOPATH=/pub/go')
+  ensure('PATH=/pub/go/bin:$PATH')
   ensure('alias b="bundle exec"')
   ensure('alias ya="youtube-dl -f bestaudio --audio-quality 0 -i -x --extract-audio"')
   ensure('alias yav="youtube-dl -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"')
@@ -246,7 +248,11 @@ const installGitconf = () => {
 install('gitconfig', false, installGitconf)
 
 // NPM
-run('sudo npm install -g eslint')
+install('eslint', () => commandExists('eslint'), () => run('sudo npm install -g eslint'))
+
+// Go
+install('goimports', () => commandExists('goimports'), () => run('go get golang.org/x/tools/cmd/goimports'))
+install('dep', () => commandExists('dep'), () => run('go get -u github.com/golang/dep/cmd/dep'))
 
 // Vim config
 const vimrcPath = path.join(os.homedir(), '.vimrc')
