@@ -299,4 +299,5 @@ ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
 )
 
 // Ruby gems
-run('gem install pry')
+install('pry', () => commandExists('pry'), () => run('gem install pry'))
+run('gem update')
