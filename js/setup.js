@@ -146,14 +146,14 @@ function installArchPackages() {
     'base-devel', 'python2', 'linux-headers',
     // ui basics
     'xorg', 'xf86-video-vesa', 'mesa-libgl', 'lightdm', 'lightdm-deepin-greeter',
-    'ttf-inconsolata',
+    'ttf-inconsolata', 'gnome-keyring',
     // i3
     'i3', 'xfce4-terminal', 'terminator', 'compton', 'dmenu', 'dunst',
     'gnome-settings-daemon', 'feh', 'udiskie',
     // web
     'firefox', 'chromium',
     // cli tools
-    'zsh', 'the_silver_searcher',
+    'zsh', 'the_silver_searcher', 'jq',
     // productivity
     'visual-studio-code', 'meld', 'colordiff',
     'ruby', 'go', 'docker',
@@ -248,14 +248,6 @@ const installGitconf = () => {
 }
 install('gitconfig', false, installGitconf)
 
-// NPM
-install('eslint', () => commandExists('eslint'), () => run('sudo npm install -g eslint'))
-install('gulp', () => commandExists('gulp'), () => run('sudo npm install -g gulp'))
-
-// Go
-install('goimports', () => commandExists('goimports'), () => run('go get golang.org/x/tools/cmd/goimports'))
-install('dep', () => commandExists('dep'), () => run('go get -u github.com/golang/dep/cmd/dep'))
-
 // Vim config
 const vimrcPath = path.join(os.homedir(), '.vimrc')
 const installVimrc = () => syncFile('vimrc', vimrcPath)
@@ -298,6 +290,15 @@ ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
   }
 )
 
+// NPM
+install('eslint', () => commandExists('eslint'), () => run('sudo npm install -g eslint'))
+install('gulp', () => commandExists('gulp'), () => run('sudo npm install -g gulp'))
+
+// Go
+install('goimports', () => commandExists('goimports'), () => run('go get golang.org/x/tools/cmd/goimports'))
+install('dep', () => commandExists('dep'), () => run('go get -u github.com/golang/dep/cmd/dep'))
+
 // Ruby gems
 install('pry', () => commandExists('pry'), () => run('gem install pry'))
+install('inspec', () => commandExists('inspec'), () => run('gem install inspec'))
 run('gem update')
