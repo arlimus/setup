@@ -114,7 +114,7 @@ function installArchPackages() {
     'visual-studio-code', 'meld', 'colordiff',
     'ruby', 'go',
     // unproductivity
-    'youtube-dl', 'telegram-desktop-bin', 'mpv', 'x265', 'alsa-utils',
+    'youtube-dl', 'telegram-desktop-bin', 'slack-desktop', 'mpv', 'x265', 'alsa-utils',
     'gthumb', 'evince',
   )
 
