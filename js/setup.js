@@ -112,6 +112,7 @@ function installArchPackages() {
     'zsh', 'the_silver_searcher',
     // productivity
     'visual-studio-code', 'meld', 'colordiff',
+    'ruby', 'go',
     // unproductivity
     'youtube-dl', 'telegram-desktop-bin', 'mpv', 'x265', 'alsa-utils',
     'gthumb', 'evince',
@@ -162,6 +163,8 @@ const configureZshrc = () => {
   c = fs.readFileSync(zshrc, 'utf-8')
   c = c.replace(/ZSH_THEME=.*/, 'ZSH_THEME="zero-dark"')
   c = c.replace(/plugins=\((.+[\s\S])+\)/, 'plugins=(git zero)')
+  p = 'PATH=$HOME/.gem/ruby/2.4.0/bin:$PATH'
+  if(!c.includes(p)) c += "\n"+p;
   fs.writeFileSync(zshrc, c)
 }
 configureZshrc()
@@ -196,3 +199,6 @@ const vimrcPath = path.join(os.homedir(), '.vimrc')
 const installVimrc = () => syncFile('vimrc', vimrcPath)
 const installColors = () => syncFiles('vimcolors', path.join(os.homedir(), '.vim/colors'))
 install('vimrc', false, () => installVimrc() && installColors())
+
+// Ruby gems
+run('gem install pry')
