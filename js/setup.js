@@ -16,6 +16,7 @@ const color = {
 }
 const print = {
   ok: x => console.log(color.ok('[ok] '+x)),
+  add: x => console.log(color.ok(x)),
   err: x => console.log(color.err(x)),
   fatal: x => { console.log(color.err(x)); process.exit(1) },
   cmd: x => console.log(color.cmd(x)),
@@ -80,6 +81,30 @@ const syncFiles = (src, dst) => {
   return shell.cp('-R', srcp, dst)
 }
 
+const ensureLines = (path, ...lines) => {
+  c = ""
+  if(fs.existsSync(path))
+    c = fs.readFileSync(path, 'utf-8')
+  cl = c.split(/\r?\n/).map(x => x.trim())
+
+  changed = false;
+  lines.forEach(line => {
+    if(!cl.includes(line)) {
+      cl.push(line)
+      print.add(`    > ${path}: + ${line}`)
+      changed = true;
+    }
+  })
+
+  if(changed) {
+    res = cl.join("\n")
+    if(!res.endsWith("\n")) res += "\n"
+    fs.writeFileSync('/tmp/ensurelines', res)
+    run(`sudo mv /tmp/ensurelines ${path}`)
+  }
+  print.ok(`ensure lines in ${path}`)
+}
+
 // OSX
 function installOsxPackages() {
   install('brew', () => commandExists('brew'), () => run(
@@ -104,7 +129,7 @@ function installArchPackages() {
     'xorg', 'xf86-video-vesa', 'mesa-libgl', 'lightdm', 'lightdm-deepin-greeter',
     'ttf-inconsolata',
     // i3
-    'i3', 'xfce4-terminal', 'terminator', 'compton', 'dmenu',
+    'i3', 'xfce4-terminal', 'terminator', 'compton', 'dmenu', 'dunst',
     'gnome-settings-daemon', 'feh', 'udiskie',
     // web
     'firefox', 'chromium',
@@ -117,6 +142,10 @@ function installArchPackages() {
     'youtube-dl', 'telegram-desktop-bin', 'slack-desktop', 'mpv', 'x265', 'alsa-utils',
     'gthumb', 'evince',
   )
+
+  ensureLines("/etc/locale.conf", "LANG=en_US.utf8")
+  ensureLines("/etc/locale.gen", "en_US.UTF-8 UTF-8")
+  run("sudo locale-gen")
 
   configureLightdm = () => {
     p = '/etc/lightdm/lightdm.conf'
