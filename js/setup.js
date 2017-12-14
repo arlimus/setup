@@ -156,7 +156,7 @@ function installArchPackages() {
     'zsh', 'the_silver_searcher',
     // productivity
     'visual-studio-code', 'meld', 'colordiff',
-    'ruby', 'go',
+    'ruby', 'go', 'docker',
     // unproductivity
     'youtube-dl', 'telegram-desktop-bin', 'slack-desktop', 'mpv', 'x265', 'alsa-utils',
     'gthumb', 'evince',
