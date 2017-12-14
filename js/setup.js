@@ -214,6 +214,7 @@ const configureZshrc = () => {
   ensure = x => { if(!c.includes(x)) c += "\n"+x; }
   ensure('PATH=$HOME/.gem/ruby/2.4.0/bin:$PATH')
   ensure('export GOPATH=/pub/go')
+  ensure('export $(gnome-keyring-daemon -s)')
   ensure('PATH=/pub/go/bin:$PATH')
   ensure('alias b="bundle exec"')
   ensure('alias ya="youtube-dl -f bestaudio --audio-quality 0 -i -x --extract-audio"')
