@@ -97,7 +97,7 @@ function installArchPackages() {
   package(
     // basics
     'git', 'vim', 'vim-surround', 'curl', 'htop',
-    'openssh', 'networkmanager', 'network-manager-applet', 'tree',
+    'openssh', 'sshfs', 'networkmanager', 'network-manager-applet', 'tree',
     // deps for parallels tools
     'base-devel', 'python2', 'linux-headers',
     // ui basics
@@ -163,8 +163,11 @@ const configureZshrc = () => {
   c = fs.readFileSync(zshrc, 'utf-8')
   c = c.replace(/ZSH_THEME=.*/, 'ZSH_THEME="zero-dark"')
   c = c.replace(/plugins=\((.+[\s\S])+\)/, 'plugins=(git zero)')
-  p = 'PATH=$HOME/.gem/ruby/2.4.0/bin:$PATH'
-  if(!c.includes(p)) c += "\n"+p;
+  ensure = x => { if(!c.includes(x)) c += "\n"+x; }
+  ensure('PATH=$HOME/.gem/ruby/2.4.0/bin:$PATH')
+  ensure('alias b="bundle exec"')
+  ensure('alias ya="youtube-dl -f bestaudio --audio-quality 0 -i -x --extract-audio"')
+  ensure('alias yav="youtube-dl -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"')
   fs.writeFileSync(zshrc, c)
 }
 configureZshrc()
