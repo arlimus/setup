@@ -81,11 +81,22 @@ const syncFiles = (src, dst) => {
   return shell.cp('-R', srcp, dst)
 }
 
+const writeFile = (path, content) => {
+  if(path.startsWith(os.homedir()))
+    return fs.writeFileSync(path, res)
+  // for anything else let's use sudo
+  fs.writeFileSync('/tmp/ensurelines', res)
+  run(`sudo mv /tmp/ensurelines ${path}`)
+}
+
+const readFile = (path, alternative = null) => {
+  if(fs.existsSync(path)) return fs.readFileSync(path, 'utf-8')
+  if(alternative == null) return print.fatal(`Cannot read file ${path}`)
+  return alternative
+}
+
 const ensureLines = (path, ...lines) => {
-  c = ""
-  if(fs.existsSync(path))
-    c = fs.readFileSync(path, 'utf-8')
-  cl = c.split(/\r?\n/).map(x => x.trim())
+  cl = readFile(path, '').split(/\r?\n/).map(x => x.trim())
 
   changed = false;
   lines.forEach(line => {
@@ -99,11 +110,19 @@ const ensureLines = (path, ...lines) => {
   if(changed) {
     res = cl.join("\n")
     if(!res.endsWith("\n")) res += "\n"
-    fs.writeFileSync('/tmp/ensurelines', res)
-    run(`sudo mv /tmp/ensurelines ${path}`)
+    writeFile(path, res)
   }
   print.ok(`ensure lines in ${path}`)
 }
+
+const ensureJson = (path, j) => {
+  c = readFile(path, '')
+  org = JSON.parse(c)
+  for(key in j) org[key] = j[key]
+  res = JSON.stringify(org, null, 2)
+  install(`json ${path}`, () => c !== res, () => writeFile(path, res))
+}
+
 
 // OSX
 function installOsxPackages() {
@@ -226,11 +245,50 @@ const installGitconf = () => {
 }
 install('gitconfig', false, installGitconf)
 
+// NPM
+run('sudo npm install -g eslint')
+
 // Vim config
 const vimrcPath = path.join(os.homedir(), '.vimrc')
 const installVimrc = () => syncFile('vimrc', vimrcPath)
 const installColors = () => syncFiles('vimcolors', path.join(os.homedir(), '.vim/colors'))
 install('vimrc', false, () => installVimrc() && installColors())
+
+// Visual Studio Code config
+const vscodeExist = runq('code --list-extensions').stdout.toString().trim().split(/\r?\n/)
+const vscodeExtensions = (...x) =>
+  x.forEach(y => install(`vscode: ${y}`, () => vscodeExist.includes(y), () => run(`code --install-extension ${y}`)))
+
+vscodeExtensions(
+  'vscodevim.vim',
+  'lukehoban.Go',
+  'zxh404.vscode-proto3',
+  'dbaeumer.vscode-eslint',
+  'HookyQR.beautify'
+)
+
+ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
+  {
+    "editor.rulers": [80],
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "vim.useCtrlKeys": false,
+    "vim.overrideCopy": false,
+    "vim.insertModeKeyBindings": [
+        {
+            "before": ["k", "j"],
+            "after": ["<Esc>"]
+        },
+        {
+            "before": ["j", "k"],
+            "after": ["<Esc>"]
+        }
+    ],
+    "vim.autoindent": true,
+    "go.formatOnSave": true,
+    "go.formatTool": "goimports",
+  }
+)
 
 // Ruby gems
 run('gem install pry')
