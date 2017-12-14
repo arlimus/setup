@@ -97,7 +97,7 @@ function installArchPackages() {
   package(
     // basics
     'git', 'vim', 'vim-surround', 'curl', 'colordiff', 'htop',
-    'openssh', 'networkmanager', 'network-manager-applet',
+    'openssh', 'networkmanager', 'network-manager-applet', 'tree',
     // deps for parallels tools
     'base-devel', 'python2', 'linux-headers',
     // ui basics
@@ -110,6 +110,11 @@ function installArchPackages() {
     'firefox', 'chromium',
     // cli tools
     'zsh', 'the_silver_searcher',
+    // productivity
+    'visual-studio-code',
+    // unproductivity
+    'youtube-dl', 'telegram-desktop-bin', 'mpv', 'x265', 'alsa-utils',
+    'gthumb', 'evince',
   )
 
   configureLightdm = () => {
