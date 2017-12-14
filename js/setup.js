@@ -250,6 +250,7 @@ install('gitconfig', false, installGitconf)
 
 // NPM
 install('eslint', () => commandExists('eslint'), () => run('sudo npm install -g eslint'))
+install('gulp', () => commandExists('gulp'), () => run('sudo npm install -g gulp'))
 
 // Go
 install('goimports', () => commandExists('goimports'), () => run('go get golang.org/x/tools/cmd/goimports'))
