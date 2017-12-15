@@ -307,5 +307,6 @@ install('dep', () => commandExists('dep'), () => run('go get -u github.com/golan
 
 // Ruby gems
 install('pry', () => commandExists('pry'), () => run('gem install pry'))
+install('bundler', () => commandExists('bundle'), () => run('gem install bundler'))
 install('inspec', () => commandExists('inspec'), () => run('gem install inspec'))
 run('gem update')
