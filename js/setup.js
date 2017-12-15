@@ -146,7 +146,7 @@ function installArchPackages() {
     'base-devel', 'python2', 'linux-headers',
     // ui basics
     'xorg', 'xf86-video-vesa', 'mesa-libgl', 'lightdm', 'lightdm-deepin-greeter',
-    'ttf-inconsolata', 'gnome-keyring',
+    'ttf-inconsolata', 'gnome-keyring', 'arc-gtk-theme',
     // i3
     'i3', 'xfce4-terminal', 'terminator', 'compton', 'dmenu', 'dunst',
     'gnome-settings-daemon', 'feh', 'udiskie',
@@ -156,7 +156,7 @@ function installArchPackages() {
     'zsh', 'the_silver_searcher', 'jq',
     // productivity
     'visual-studio-code', 'meld', 'colordiff',
-    'ruby', 'go', 'docker',
+    'ruby', 'go', 'docker', 'gimp', 'imagemagick',
     // unproductivity
     'youtube-dl', 'telegram-desktop-bin', 'slack-desktop', 'mpv', 'x265', 'alsa-utils',
     'gthumb', 'evince',
@@ -222,6 +222,12 @@ const configureZshrc = () => {
   fs.writeFileSync(zshrc, c)
 }
 configureZshrc()
+
+// Gtk config with dark color theme
+const gtk2confPath = path.join(os.homedir(), '.gtkrc-2.0')
+const gtk3confPath = path.join(os.homedir(), '.config/gtk-3.0/settings.ini')
+install('gtk2 config', false, () => syncFile('gtk2settings.ini', gtk2confPath))
+install('gtk3 config', false, () => syncFile('gtk3settings.ini', gtk3confPath))
 
 // Gitconfig
 const gitconfPath = path.join(os.homedir(), '.gitconfig')
