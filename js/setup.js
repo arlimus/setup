@@ -224,10 +224,11 @@ const configureZshrc = () => {
 configureZshrc()
 
 // Gtk config with dark color theme
+const gtkVariant = 'dark'
 const gtk2confPath = path.join(os.homedir(), '.gtkrc-2.0')
 const gtk3confPath = path.join(os.homedir(), '.config/gtk-3.0/settings.ini')
-install('gtk2 config', false, () => syncFile('gtk2settings.ini', gtk2confPath))
-install('gtk3 config', false, () => syncFile('gtk3settings.ini', gtk3confPath))
+install('gtk2 config', false, () => syncFile('gtk2settings.'+gtkVariant+'.ini', gtk2confPath))
+install('gtk3 config', false, () => syncFile('gtk3settings.'+gtkVariant+'.ini', gtk3confPath))
 
 // Gitconfig
 const gitconfPath = path.join(os.homedir(), '.gitconfig')
