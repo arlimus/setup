@@ -271,7 +271,8 @@ vscodeExtensions(
   'lukehoban.Go',
   'zxh404.vscode-proto3',
   'dbaeumer.vscode-eslint',
-  'HookyQR.beautify'
+  'HookyQR.beautify',
+  'BriteSnow.vscode-toggle-quotes'
 )
 
 ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
