@@ -292,6 +292,7 @@ ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
         }
     ],
     "vim.autoindent": true,
+    "vim.surround": true,
     "go.formatOnSave": true,
     "go.formatTool": "goimports",
   }
