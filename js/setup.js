@@ -78,7 +78,10 @@ const syncFiles = (src, dst) => {
     return print.err(`Cannot find source file in ${srcp}`)
   console.log(`${srcp} -> ${dst}`)
   shell.mkdir('-p', path.dirname(dst))
-  return shell.cp('-R', srcp, dst)
+  if(dst.startsWith(os.homedir()))
+    return shell.cp('-R', srcp, dst)
+  else
+    return run(`sudo cp ${srcp} ${dst}`)
 }
 
 const writeFile = (path, content) => {
@@ -170,7 +173,8 @@ function installArchPackages() {
     p = '/etc/lightdm/lightdm.conf'
     c = fs.readFileSync(p, 'utf-8')
     c = c.replace(/^#?greeter-session=.*/m, 'greeter-session=lightdm-deepin-greeter')
-    c = c.replace(/^#?display-setup-script=.*/m, `display-setup-script=xrandr --output default --mode ${resolution}`)
+    syncFiles('xrandr.resize', '/usr/local/bin/xrandr.resize')
+    c = c.replace(/^#?display-setup-script=.*/m, `display-setup-script=xrandr.resize`)
     fs.writeFileSync('/tmp/lightdmconf', c)
     run(`sudo mv /tmp/lightdmconf ${p}`)
   }

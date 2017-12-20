@@ -1,0 +1,7 @@
+#!/bin/bash
+log="/var/log/xrandr.resize.log"
+echo "--- run $(date)" >> $log
+xrandr >> $log
+xrandr --newmode "1920x1200_59.95" 193.475 1920 2050 2256 2592 1200 1203 1209 1245 -hsync +vsync
+xrandr --addmode Virtual1 1920x1200_59.95
+xrandr --output Virtual1 --mode 1920x1200_59.95 >> $log 2>&1
