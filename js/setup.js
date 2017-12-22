@@ -162,7 +162,7 @@ function installArchPackages() {
     'ruby', 'go', 'docker', 'gimp', 'imagemagick',
     // unproductivity
     'youtube-dl', 'telegram-desktop-bin', 'slack-desktop', 'mpv', 'x265', 'alsa-utils',
-    'gthumb', 'evince',
+    'gthumb', 'evince', 'mediainfo',
   )
 
   ensureLines("/etc/locale.conf", "LANG=en_US.utf8")
