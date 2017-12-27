@@ -143,7 +143,7 @@ const resolution = '1920x1200'
 function installArchPackages() {
   package(
     // basics
-    'git', 'vim', 'vim-surround', 'curl', 'htop', 'p7zip',
+    'git', 'vim', 'vim-surround', 'curl', 'htop', 'p7zip', 'encfs',
     'openssh', 'sshfs', 'networkmanager', 'network-manager-applet', 'tree',
     // deps for parallels tools
     'base-devel', 'python2', 'linux-headers',
@@ -157,6 +157,8 @@ function installArchPackages() {
     'firefox', 'chromium',
     // cli tools
     'zsh', 'the_silver_searcher', 'jq',
+    // devices
+    'android-tools',
     // productivity
     'visual-studio-code', 'meld', 'colordiff',
     'ruby', 'go', 'docker', 'gimp', 'imagemagick',
