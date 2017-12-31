@@ -18,3 +18,5 @@ Requirements:
 3. this git repo
 
 Tiny bootstrap script **which must be run as root**: [arch.bootstrap.sh](arch.bootstrap.sh)
+
+(run a test via `docker build --file arch.dockerfile . --rm -t arlimus/setup:latest`)
