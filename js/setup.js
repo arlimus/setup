@@ -146,7 +146,7 @@ function installArchPackages() {
     'git', 'vim', 'vim-surround', 'curl', 'htop', 'p7zip', 'encfs',
     'openssh', 'sshfs', 'networkmanager', 'network-manager-applet', 'tree',
     // deps for parallels tools
-    'base-devel', 'python2', 'linux-headers',
+    'base-devel', 'python2', 'linux-headers', 'nodejs', 'npm', 'yarn',
     // ui basics
     'xorg', 'xf86-video-vesa', 'mesa-libgl', 'lightdm', 'lightdm-deepin-greeter',
     'ttf-inconsolata', 'gnome-keyring', 'arc-gtk-theme',
@@ -220,6 +220,7 @@ const configureZshrc = () => {
 }
 configureZshrc()
 
+// UI configs
 // Gtk config with dark color theme
 const gtkVariant = 'dark'
 const gtk2confPath = path.join(os.homedir(), '.gtkrc-2.0')
@@ -227,7 +228,6 @@ const gtk3confPath = path.join(os.homedir(), '.config/gtk-3.0/settings.ini')
 install('gtk2 config', false, () => syncFile('gtk2settings.'+gtkVariant+'.ini', gtk2confPath))
 install('gtk3 config', false, () => syncFile('gtk3settings.'+gtkVariant+'.ini', gtk3confPath))
 
-// UI configs
 // gnome-screenshots autosave location to ~/Screenshots
 screenspath = path.join(os.homedir(), "Screenshots")
 install('~/Screenshots', () => fs.existsSync(screenspath), () => run(`mkdir ${screenspath}`))
