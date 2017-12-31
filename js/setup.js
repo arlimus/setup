@@ -236,6 +236,12 @@ const gtk3confPath = path.join(os.homedir(), '.config/gtk-3.0/settings.ini')
 install('gtk2 config', false, () => syncFile('gtk2settings.'+gtkVariant+'.ini', gtk2confPath))
 install('gtk3 config', false, () => syncFile('gtk3settings.'+gtkVariant+'.ini', gtk3confPath))
 
+// Gsettings
+// gnome-screenshots autosave location to ~/Screenshots
+screenspath = path.join(os.homedir(), "Screenshots")
+install('~/Screenshots', () => fs.existsSync(screenspath), () => run(`mkdir ${screenspath}`))
+run('gsettings set org.gnome.gnome-screenshot auto-save-directory "file:///home/$USER/Screenshots/"')
+
 // Gitconfig
 const gitconfPath = path.join(os.homedir(), '.gitconfig')
 const gitconfSet = x => {
