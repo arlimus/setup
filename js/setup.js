@@ -207,7 +207,7 @@ install('oh-my-zsh', false, installOhMyZsh)
 const configureZshrc = () => {
   c = fs.readFileSync(zshrc, 'utf-8')
   c = c.replace(/ZSH_THEME=.*/, 'ZSH_THEME="zero-dark"')
-  c = c.replace(/plugins=\((.+[\s\S])+\)/, 'plugins=(git zero)')
+  c = c.replace(/^plugins=\((.+[\s\S])+\)/m, 'plugins=(git zero)')
   ensure = x => { if(!c.includes(x)) c += "\n"+x; }
   ensure('PATH=$HOME/.gem/ruby/2.4.0/bin:$PATH')
   ensure('export GOPATH=/pub/go')
