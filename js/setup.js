@@ -146,7 +146,7 @@ function installArchPackages() {
     'git', 'vim', 'vim-surround', 'curl', 'htop', 'p7zip', 'encfs',
     'openssh', 'sshfs', 'networkmanager', 'network-manager-applet', 'tree',
     // deps for parallels tools
-    'base-devel', 'python2', 'linux-headers', 'nodejs', 'npm', 'yarn',
+    'base-devel', 'python2', 'nodejs', 'npm', 'yarn',
     // ui basics
     'xorg', 'xf86-video-vesa', 'mesa-libgl', 'lightdm', 'lightdm-deepin-greeter',
     'ttf-inconsolata', 'gnome-keyring', 'arc-gtk-theme',
