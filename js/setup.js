@@ -160,7 +160,7 @@ function installArchPackages() {
     // devices
     'android-tools',
     // productivity
-    'visual-studio-code', 'meld', 'colordiff',
+    'visual-studio-code-bin', 'meld', 'colordiff',
     'ruby', 'go', 'docker', 'gimp', 'imagemagick',
     // unproductivity
     'youtube-dl', 'telegram-desktop-bin', 'slack-desktop', 'mpv', 'x265', 'alsa-utils',
