@@ -190,15 +190,6 @@ function installArchPackages() {
     console.error("Please install parallels tools manually!")
   }
   install('parallels-tools', () => fs.existsSync('/usr/lib/parallels-tools/version'), () => installParallelsTools())
-
-  const configureI3 = () => syncFiles('i3.config', path.join(os.homedir(), '.i3/config'))
-  install('i3-config', false, configureI3)
-
-  const configureCompton = () => syncFiles('compton.conf', path.join(os.homedir(), '.config/compton.conf'))
-  install('compton conf', false, configureCompton)
-
-  const configureTerm = () => syncFiles('xfce4terminal.rc', path.join(os.homedir(), '.config/xfce4/terminal/terminalrc'))
-  install('xfce4-terminal', false, configureTerm)
 }
 if(isArch) { installArchPackages() }
 
@@ -236,11 +227,23 @@ const gtk3confPath = path.join(os.homedir(), '.config/gtk-3.0/settings.ini')
 install('gtk2 config', false, () => syncFile('gtk2settings.'+gtkVariant+'.ini', gtk2confPath))
 install('gtk3 config', false, () => syncFile('gtk3settings.'+gtkVariant+'.ini', gtk3confPath))
 
-// Gsettings
+// UI configs
 // gnome-screenshots autosave location to ~/Screenshots
 screenspath = path.join(os.homedir(), "Screenshots")
 install('~/Screenshots', () => fs.existsSync(screenspath), () => run(`mkdir ${screenspath}`))
 run('gsettings set org.gnome.gnome-screenshot auto-save-directory "file:///home/$USER/Screenshots/"')
+
+// i3
+const configureI3 = () => syncFiles('i3.config', path.join(os.homedir(), '.i3/config'))
+install('i3-config', false, configureI3)
+
+// compton
+const configureCompton = () => syncFiles('compton.conf', path.join(os.homedir(), '.config/compton.conf'))
+install('compton conf', false, configureCompton)
+
+// terminal
+const configureTerm = () => syncFiles('xfce4terminal.rc', path.join(os.homedir(), '.config/xfce4/terminal/terminalrc'))
+install('xfce4-terminal', false, configureTerm)
 
 // Gitconfig
 const gitconfPath = path.join(os.homedir(), '.gitconfig')
