@@ -1,0 +1,7 @@
+sudo: required
+
+services:
+  - docker
+
+script:
+  docker build --file arch.dockerfile . --rm -t arlimus/setup:latest
