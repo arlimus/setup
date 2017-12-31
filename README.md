@@ -12,43 +12,9 @@ Tiny collection of setup helpers. Configures:
 
 ## Arch Linux
 
-Requirements
+Requirements:
+1. a regular user
+2. sudo for this user (recommended: passwordless)
+3. this git repo
 
-1. Set up a regular user:
-
-    ```bash
-    useradd -m USERNAME
-    ```
-
-2. Install and setup sudo:
-
-    ```bash
-    pacman -S sudo
-    visudo
-    ```
-
-    Make sure to add a line with your username at the end:
-
-    ```bash
-    USERNAME ALL=(ALL) NOPASSWD: ALL
-    ```
-
-3. Log into the regular user:
-
-    ```bash
-    su - USERNAME
-    ```
-
-4. Get this repo via git:
-
-    ```bash
-    sudo pacman -S git
-    git clone https://github.com/arlimus/setup
-    cd setup
-    ```
-
-You can now run this setup:
-
-```bash
-./arch
-```
+Tiny bootstrap script **which must be run as root**: [arch.bootstrap.sh](arch.bootstrap.sh)
