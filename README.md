@@ -20,3 +20,11 @@ Requirements:
 Tiny bootstrap script **which must be run as root**: [arch.bootstrap.sh](arch.bootstrap.sh)
 
 (run a test via `docker build --file arch.dockerfile . --rm -t arlimus/setup:latest`)
+
+
+## Configuration
+
+The following env variables may be used:
+
+* `GIT_USER_NAME` for git username configuration; if no git user name is configured the script will interactively ask you for one. If a name has been set in your `.gitconfig` it will be used instead.
+* `GIT_USER_EMAIL` same as `GIT_USER_NAME` just for email address

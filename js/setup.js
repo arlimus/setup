@@ -265,7 +265,10 @@ const installGitconf = () => {
     email: runq('git config --global user.email').stdout.toString().trim(),
   };
   syncFile('gitconfig', gitconfPath)
-  if(o.name == '' || o.name == 'Your Name' || o.email == '') gitconfSettings()
+  if(o.name == 'Your Name') o.name = '';
+  o.name = process.env.GIT_USER_NAME || o.name
+  o.email = process.env.GIT_USER_EMAIL || o.email
+  if(o.name == '' || o.email == '') gitconfSettings()
   else gitconfSet(o);
 }
 install('gitconfig', false, installGitconf)
