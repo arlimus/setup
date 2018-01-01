@@ -287,7 +287,8 @@ vscodeExtensions(
   'zxh404.vscode-proto3',
   'dbaeumer.vscode-eslint',
   'HookyQR.beautify',
-  'BriteSnow.vscode-toggle-quotes'
+  'BriteSnow.vscode-toggle-quotes',
+  'PeterJausovec.vscode-docker'
 )
 
 ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
