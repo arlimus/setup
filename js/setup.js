@@ -119,8 +119,13 @@ const ensureLines = (path, ...lines) => {
 }
 
 const ensureJson = (path, j) => {
-  c = readFile(path, '')
-  org = JSON.parse(c)
+  try {
+    c = readFile(path, '')
+    org = JSON.parse(c)
+  } catch(err) {
+    org = {}
+  }
+
   for(key in j) org[key] = j[key]
   res = JSON.stringify(org, null, 2)
   install(`json ${path}`, () => c !== res, () => writeFile(path, res))
