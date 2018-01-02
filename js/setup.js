@@ -119,8 +119,13 @@ const ensureLines = (path, ...lines) => {
 }
 
 const ensureJson = (path, j) => {
-  c = readFile(path, '')
-  org = JSON.parse(c)
+  try {
+    c = readFile(path, '')
+    org = JSON.parse(c)
+  } catch(err) {
+    org = {}
+  }
+
   for(key in j) org[key] = j[key]
   res = JSON.stringify(org, null, 2)
   install(`json ${path}`, () => c !== res, () => writeFile(path, res))
@@ -147,25 +152,32 @@ function installArchPackages() {
     'openssh', 'sshfs', 'networkmanager', 'network-manager-applet', 'tree',
     // deps for parallels tools
     'base-devel', 'python2', 'nodejs', 'npm', 'yarn',
+    // cli tools
+    'zsh', 'the_silver_searcher', 'jq',
+    // productivity
+    'ruby', 'go', 'imagemagick',
+    // configurables
+    'lightdm', 'visual-studio-code-bin',
+  )
+  if(process.env.INSTALL_EXTRAS != 'false') {
+    package(
     // ui basics
-    'xorg', 'xf86-video-vesa', 'mesa-libgl', 'lightdm', 'lightdm-deepin-greeter',
+    'xorg', 'xf86-video-vesa', 'mesa-libgl', 'lightdm-deepin-greeter',
     'ttf-inconsolata', 'gnome-keyring', 'arc-gtk-theme',
     // i3
     'i3', 'xfce4-terminal', 'terminator', 'compton', 'dmenu', 'dunst',
     'gnome-settings-daemon', 'feh', 'udiskie',
     // web
     'firefox', 'chromium',
-    // cli tools
-    'zsh', 'the_silver_searcher', 'jq',
     // devices
     'android-tools',
     // productivity
-    'visual-studio-code-bin', 'meld', 'colordiff',
-    'ruby', 'go', 'docker', 'gimp', 'imagemagick',
+    'meld', 'colordiff', 'docker', 'gimp',
     // unproductivity
     'youtube-dl', 'telegram-desktop-bin', 'slack-desktop', 'mpv', 'x265', 'alsa-utils',
     'gthumb', 'gnome-screenshot', 'evince', 'mediainfo',
-  )
+    )
+  }
 
   ensureLines("/etc/locale.conf", "LANG=en_US.utf8")
   ensureLines("/etc/locale.gen", "en_US.UTF-8 UTF-8")
@@ -265,7 +277,10 @@ const installGitconf = () => {
     email: runq('git config --global user.email').stdout.toString().trim(),
   };
   syncFile('gitconfig', gitconfPath)
-  if(o.name == '' || o.name == 'Your Name' || o.email == '') gitconfSettings()
+  if(o.name == 'Your Name') o.name = '';
+  o.name = process.env.GIT_USER_NAME || o.name
+  o.email = process.env.GIT_USER_EMAIL || o.email
+  if(o.name == '' || o.email == '') gitconfSettings()
   else gitconfSet(o);
 }
 install('gitconfig', false, installGitconf)
