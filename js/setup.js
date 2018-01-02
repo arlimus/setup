@@ -153,19 +153,25 @@ function installArchPackages() {
     // i3
     'i3', 'xfce4-terminal', 'terminator', 'compton', 'dmenu', 'dunst',
     'gnome-settings-daemon', 'feh', 'udiskie',
-    // web
-    'firefox', 'chromium',
     // cli tools
     'zsh', 'the_silver_searcher', 'jq',
+    // productivity
+    'ruby', 'go', 'imagemagick',
+  )
+  if(process.env.INSTALL_EXTRAS != 'false') {
+    package(
+    // web
+    'firefox', 'chromium',
     // devices
     'android-tools',
     // productivity
     'visual-studio-code-bin', 'meld', 'colordiff',
-    'ruby', 'go', 'docker', 'gimp', 'imagemagick',
+    'docker', 'gimp',
     // unproductivity
     'youtube-dl', 'telegram-desktop-bin', 'slack-desktop', 'mpv', 'x265', 'alsa-utils',
     'gthumb', 'gnome-screenshot', 'evince', 'mediainfo',
-  )
+    )
+  }
 
   ensureLines("/etc/locale.conf", "LANG=en_US.utf8")
   ensureLines("/etc/locale.gen", "en_US.UTF-8 UTF-8")
