@@ -342,4 +342,6 @@ install('dep', () => commandExists('dep'), () => run('go get -u github.com/golan
 install('pry', () => commandExists('pry'), () => run('gem install pry'))
 install('bundler', () => commandExists('bundle'), () => run('gem install bundler'))
 install('inspec', () => commandExists('inspec'), () => run('gem install inspec'))
-run('gem update')
+if(process.env.INSTALL_EXTRAS != 'false') {
+  run('gem update')
+}
