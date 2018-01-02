@@ -147,19 +147,21 @@ function installArchPackages() {
     'openssh', 'sshfs', 'networkmanager', 'network-manager-applet', 'tree',
     // deps for parallels tools
     'base-devel', 'python2', 'nodejs', 'npm', 'yarn',
-    // ui basics
-    'xorg', 'xf86-video-vesa', 'mesa-libgl', 'lightdm', 'lightdm-deepin-greeter',
-    'ttf-inconsolata', 'gnome-keyring', 'arc-gtk-theme',
-    // i3
-    'i3', 'xfce4-terminal', 'terminator', 'compton', 'dmenu', 'dunst',
-    'gnome-settings-daemon', 'feh', 'udiskie',
     // cli tools
     'zsh', 'the_silver_searcher', 'jq',
     // productivity
     'ruby', 'go', 'imagemagick',
+    // configurables
+    'lightdm',
   )
   if(process.env.INSTALL_EXTRAS != 'false') {
     package(
+    // ui basics
+    'xorg', 'xf86-video-vesa', 'mesa-libgl', 'lightdm-deepin-greeter',
+    'ttf-inconsolata', 'gnome-keyring', 'arc-gtk-theme',
+    // i3
+    'i3', 'xfce4-terminal', 'terminator', 'compton', 'dmenu', 'dunst',
+    'gnome-settings-daemon', 'feh', 'udiskie',
     // web
     'firefox', 'chromium',
     // devices
