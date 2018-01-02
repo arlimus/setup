@@ -152,7 +152,7 @@ function installArchPackages() {
     // productivity
     'ruby', 'go', 'imagemagick',
     // configurables
-    'lightdm',
+    'lightdm', 'visual-studio-code-bin',
   )
   if(process.env.INSTALL_EXTRAS != 'false') {
     package(
@@ -167,8 +167,7 @@ function installArchPackages() {
     // devices
     'android-tools',
     // productivity
-    'visual-studio-code-bin', 'meld', 'colordiff',
-    'docker', 'gimp',
+    'meld', 'colordiff', 'docker', 'gimp',
     // unproductivity
     'youtube-dl', 'telegram-desktop-bin', 'slack-desktop', 'mpv', 'x265', 'alsa-utils',
     'gthumb', 'gnome-screenshot', 'evince', 'mediainfo',
