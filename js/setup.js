@@ -304,7 +304,9 @@ vscodeExtensions(
   'dbaeumer.vscode-eslint',
   'HookyQR.beautify',
   'BriteSnow.vscode-toggle-quotes',
-  'PeterJausovec.vscode-docker'
+  'PeterJausovec.vscode-docker',
+  'esbenp.prettier-vscode',
+  'passionkind.prettier-vscode-with-tabs'
 )
 
 ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
