@@ -193,6 +193,7 @@ function installArchPackages() {
     run(`sudo mv /tmp/lightdmconf ${p}`)
   }
   install('configure lightdm', false, configureLightdm)
+  run('sudo systemctl enable lightdm')
   run('sudo systemctl enable NetworkManager')
 
   run('sudo ln -sf /usr/lib/systemd/scripts/ /etc/init.d')
