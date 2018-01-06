@@ -16,9 +16,9 @@ editor = vim
 # [url "https://"]
 #  insteadOf = git://
 #
-# # Example:
-# [url "git@github.com:"]
-# insteadOf = https://github.com/
+# Example:
+[url "git@github.com:"]
+insteadOf = https://github.com/
 
 ## in case you push to unverifyable https, disable verification
 # [http]
