@@ -151,7 +151,7 @@ function installArchPackages() {
     'git', 'vim', 'vim-surround', 'curl', 'htop', 'p7zip', 'encfs',
     'openssh', 'sshfs', 'networkmanager', 'network-manager-applet', 'tree',
     // deps for parallels tools
-    'base-devel', 'python2', 'nodejs', 'npm', 'yarn',
+    'base-devel', 'python2', 'nodejs', 'npm', 'yarn', 'python-pip',
     // cli tools
     'zsh', 'the_silver_searcher', 'jq',
     // productivity
@@ -175,7 +175,7 @@ function installArchPackages() {
     'meld', 'colordiff', 'docker', 'gimp',
     // unproductivity
     'youtube-dl', 'telegram-desktop-bin', 'slack-desktop', 'mpv', 'x265', 'alsa-utils',
-    'gthumb', 'gnome-screenshot', 'evince', 'mediainfo',
+    'gthumb', 'gnome-screenshot', 'evince', 'mediainfo', 'vorbis-tools', 'opus-tools',
     )
   }
 
