@@ -203,6 +203,8 @@ function installArchPackages() {
     console.error("Please install parallels tools manually!")
   }
   install('parallels-tools', () => fs.existsSync('/usr/lib/parallels-tools/version'), () => installParallelsTools())
+
+  install('inco', () => fs.existsSync('/usr/local/bin/inco'), () => syncFiles('inco.sh', '/usr/local/bin/inco'))
 }
 if(isArch) { installArchPackages() }
 
