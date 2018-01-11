@@ -224,7 +224,7 @@ const configureZshrc = () => {
   c = c.replace(/ZSH_THEME=.*/, 'ZSH_THEME="zero-dark"')
   c = c.replace(/^plugins=\((.+[\s\S])+\)/m, 'plugins=(git zero)')
   ensure = x => { if(!c.includes(x)) c += "\n"+x; }
-  ensure('PATH=$HOME/.gem/ruby/2.4.0/bin:$PATH')
+  ensure('PATH=$HOME/.gem/ruby/2.5.0/bin:$PATH')
   ensure('export GOPATH=/pub/go')
   ensure('export $(gnome-keyring-daemon -s)')
   ensure('PATH=/pub/go/bin:$PATH')
