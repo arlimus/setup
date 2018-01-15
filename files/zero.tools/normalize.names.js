@@ -37,7 +37,10 @@ const normNames = (x, apply, stats) => {
   r = r.replace(/-[-]+/g, '-')
   r = r.replace(/-[-]+/g, '-')
   r = r.replace(/\.\.+/g, sep)
+  r = r.replace(/\b\.+$/, '')
   r = r.toLowerCase()
+  if(bn != r) r = r.replace(/^\.+/, '')
+
   if(bn == r) {
     if(apply) return process.stdout.write(colors.gray('='))
     console.log(colors.gray(`${r} (unchanged)`))
