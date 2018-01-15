@@ -260,6 +260,16 @@ install('compton conf', false, configureCompton)
 const configureTerm = () => syncFiles('xfce4terminal.rc', path.join(os.homedir(), '.config/xfce4/terminal/terminalrc'))
 install('xfce4-terminal', false, configureTerm)
 
+// zero tools
+toolsHome = path.join(os.homedir(), '.zero.tools')
+syncFiles('zero.tools', toolsHome)
+run([
+  'cd '+toolsHome,
+  'yarn',
+  // and install
+  'sudo ln -s $(pwd)/normalize.names.js /usr/local/bin/normalize.names'
+].join(' && '))
+
 // Gitconfig
 const gitconfPath = path.join(os.homedir(), '.gitconfig')
 const gitconfSet = x => {

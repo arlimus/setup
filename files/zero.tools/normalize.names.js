@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const colors = require('colors/safe');
 const inquirer = require('inquirer');
 const fs = require('fs');
