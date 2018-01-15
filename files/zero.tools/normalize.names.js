@@ -6,6 +6,11 @@ const path = require('path');
 const glob = require('glob').sync;
 const files = process.argv.slice(2)
 
+if(files.length == 0) {
+  console.log("Usage: normalize.names <folder>")
+  process.exit(0)
+}
+
 const sep = '.'
 const _s = (len, unit) => '' + len + ' ' + unit + ((len > 1) ? 's' : '')
 
