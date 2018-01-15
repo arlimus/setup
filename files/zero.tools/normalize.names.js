@@ -22,7 +22,7 @@ const rename = (dir, bn, nu_bn) => {
     return false;
   } 
   fs.renameSync(org, nu)
-  process.stdout.write(colors.green('.'))
+  process.stdout.write(colors.green('+'))
 }
 
 const normNames = (x, apply, stats) => {
