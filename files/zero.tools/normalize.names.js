@@ -43,6 +43,8 @@ const normNames = (x, apply, stats) => {
   r = r.replace(/-[-]+/g, '-')
   r = r.replace(/\.\.+/g, sep)
   r = r.replace(/\b\.+$/, '')
+  r = r.replace(/1280x720/g, '720p')
+  r = r.replace(/1920x1080/g, '1080p')
   r = r.toLowerCase()
   if(bn != r) r = r.replace(/^\.+/, '')
 
