@@ -183,6 +183,9 @@ function installArchPackages() {
   ensureLines("/etc/locale.gen", "en_US.UTF-8 UTF-8")
   run("sudo locale-gen")
 
+  ensureLines("/etc/security/limits.conf", "* hard core 0")
+  syncFiles('coredump.conf', '/etc/systemd/coredump.conf.d/custom.conf')
+
   configureLightdm = () => {
     p = '/etc/lightdm/lightdm.conf'
     c = fs.readFileSync(p, 'utf-8')
