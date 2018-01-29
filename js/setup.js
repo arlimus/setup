@@ -155,7 +155,7 @@ function installArchPackages() {
     // cli tools
     'zsh', 'the_silver_searcher', 'jq',
     // productivity
-    'ruby', 'go', 'imagemagick',
+    'ruby', 'go', 'imagemagick', 'graphicsmagick',
     // configurables
     'lightdm', 'visual-studio-code-bin',
   )
