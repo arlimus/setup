@@ -27,12 +27,14 @@ const rename = (dir, bn, nu_bn) => {
 const normNames = (x, apply, stats) => {
   var dir = path.dirname(x)
   var bn = path.basename(x)
-  var r = bn.replace(/\s+/g, sep) 
+  var r = bn
 
   // if the name only separates by _ instead of . we replace all those first
-  if(r.match(/\.[^.]+\./) == null)
+  if(r.match(/\.[^.]+\./) == null) {
     r = r.replace(/[_]+/g, '.')
+  }
 
+  r = r.replace(/\s+/g, sep)
   r = r.replace(/[\[\({]+/g, sep + '-' + sep)
   r = r.replace(/[\]\)!]+/g, sep)
   r = r.replace(/[&$]/g, '+')
