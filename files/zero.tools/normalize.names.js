@@ -4,11 +4,10 @@ const inquirer = require('inquirer');
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob').sync;
-const files = process.argv.slice(2)
+var files = process.argv.slice(2)
 
 if(files.length == 0) {
-  console.log("Usage: normalize.names <folder>")
-  process.exit(0)
+  files = ['.']
 }
 
 const sep = '.'
