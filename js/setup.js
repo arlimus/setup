@@ -165,7 +165,7 @@ function installArchPackages() {
     'xorg', 'xf86-video-vesa', 'mesa-libgl', 'lightdm-deepin-greeter',
     'ttf-inconsolata', 'gnome-keyring', 'arc-gtk-theme',
     // i3
-    'i3', 'xfce4-terminal', 'terminator', 'compton', 'dmenu', 'dunst',
+    'i3', 'xfce4-terminal', 'compton', 'dmenu', 'dunst',
     'gnome-settings-daemon', 'feh', 'udiskie',
     // web
     'firefox', 'chromium',
