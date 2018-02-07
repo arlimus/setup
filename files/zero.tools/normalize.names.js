@@ -34,6 +34,12 @@ const normNames = (x, apply, stats) => {
     r = r.replace(/[_]+/g, '.')
   }
 
+  // grabbing prefix expressions on some files like: "[nano] file name" => "nano"
+  var subex = r.match(/^\[.*?\]/)
+  if(subex != null) {
+    r = r.replace(/(.*)\./, "$1"+subex[0]+".").slice(subex[0].length)
+  }
+
   r = r.replace(/\s+/g, sep)
   r = r.replace(/[\[\({]+/g, sep + '-' + sep)
   r = r.replace(/[\]\)!]+/g, sep)
