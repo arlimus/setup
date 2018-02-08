@@ -172,7 +172,7 @@ function installArchPackages() {
     // devices
     'android-tools',
     // productivity
-    'meld', 'colordiff', 'docker', 'gimp', 'inotify-tools', 'httpie',
+    'meld', 'colordiff', 'docker', 'gimp', 'inotify-tools', 'httpie', 'protobuf',
     // unproductivity
     'youtube-dl', 'telegram-desktop-bin', 'slack-desktop', 'mpv', 'x265', 'alsa-utils',
     'gthumb', 'gnome-screenshot', 'evince', 'mediainfo', 'vorbis-tools', 'opus-tools',
@@ -355,6 +355,7 @@ install('gulp', () => commandExists('gulp'), () => run('sudo npm install -g gulp
 // Go
 install('goimports', () => commandExists('goimports'), () => run('go get golang.org/x/tools/cmd/goimports'))
 install('dep', () => commandExists('dep'), () => run('go get -u github.com/golang/dep/cmd/dep'))
+install('protoc', false, () => commandExists('go get -u github.com/golang/protobuf/protoc-gen-go'))
 
 // Ruby gems
 install('pry', () => commandExists('pry'), () => run('gem install pry'))
