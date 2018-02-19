@@ -172,7 +172,7 @@ function installArchPackages() {
     // devices
     'android-tools',
     // productivity
-    'meld', 'colordiff', 'docker', 'gimp', 'inotify-tools', 'httpie', 'protobuf',
+    'meld', 'colordiff', 'docker', 'gimp', 'inotify-tools', 'httpie', 'protobuf', 'rsync',
     // unproductivity
     'youtube-dl', 'telegram-desktop-bin', 'slack-desktop', 'mpv', 'x265', 'alsa-utils',
     'gthumb', 'gnome-screenshot', 'evince', 'mediainfo', 'vorbis-tools', 'opus-tools',
