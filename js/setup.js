@@ -321,7 +321,8 @@ vscodeExtensions(
   'BriteSnow.vscode-toggle-quotes',
   'PeterJausovec.vscode-docker',
   'esbenp.prettier-vscode',
-  'passionkind.prettier-vscode-with-tabs'
+  'passionkind.prettier-vscode-with-tabs',
+  'pnp.polacode'
 )
 
 ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
