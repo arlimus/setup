@@ -24,7 +24,7 @@ const rename = (dir, bn, nu_bn) => {
   process.stdout.write(colors.green('+'))
 }
 
-const normNames = (x, apply, stats) => {
+const normName = (x, apply, stats) => {
   var dir = path.dirname(x)
   var bn = path.basename(x)
   var r = bn
@@ -57,12 +57,10 @@ const normNames = (x, apply, stats) => {
 
   if(bn == r) {
     if(apply) return process.stdout.write(colors.gray('='))
-    console.log(colors.gray(`${r} (unchanged)`))
-    if(stats != null) stats.unchanged += 1
+    if(stats != null) stats.unchanged.push(colors.gray(`${r} (unchanged)`))
   } else {
     if(apply) return rename(dir, bn, r)
-    console.log(`${colors.blue(bn)}  -->  ${colors.cyan(r)}`)
-    if(stats != null) stats.rename += 1
+    if(stats != null) stats.rename.push(`${colors.blue(bn)}  -->  ${colors.cyan(r)}`)
   }
 }
 const flatten = x => [].concat.apply([], x.filter(i=>i))
@@ -78,21 +76,34 @@ const expandFiles = files => flatten(files.map(x => {
   return nu
 }))
 
+const printStats = stats => {
+  if(stats == null) return;
+  stats.unchanged.forEach(x => console.log(x))
+  stats.rename.forEach(x => console.log(x))
+}
+
 console.log(colors.green(`Input: ${_s(files.length, 'file')}`))
 
 xfiles = expandFiles(files)
 console.log(colors.green(`Expanded files: ${_s(xfiles.length, 'xfiles')}`))
 
-var stats = { rename: 0, unchanged: 0 }
-xfiles.forEach(x => normNames(x, false, stats))
+var stats = { rename: [], unchanged: [] }
+xfiles.forEach(x => normName(x, false, stats))
+
+printStats(stats)
+if(stats.rename.length === 0) {
+  console.log("Nothing to rename. We are done.")
+  process.exit(0)
+}
+
 inquirer.prompt({ type: 'confirm', name: 'rename',
-  message: `Do you want to rename these ${stats.rename} files? (${stats.unchanged} unchanged)`, default: false
+  message: `Do you want to rename these ${stats.rename.length} files? (${stats.unchanged.length} unchanged)`, default: false
 }).then(answers => {
   if(!answers.rename) {
     console.log("Aborting.")
     process.exit(0)
   }
-  xfiles.forEach(x => normNames(x, true))
+  xfiles.forEach(x => normName(x, true))
   console.log(colors.green("All done."))
   process.exit(0)
 })
