@@ -33,6 +33,9 @@ const normName = (x, apply, stats) => {
   if(r.match(/\.[^.]+\./) == null) {
     r = r.replace(/[_]+/g, '.')
   }
+  r = r.replace(/\x84/g, "ä")
+       .replace(/\x81/g, "ü")
+       .replace(/\x94/g, "ö")
 
   // grabbing prefix expressions on some files like: "[nano] file name" => "nano"
   var subex = r.match(/^\[.*?\]/)
