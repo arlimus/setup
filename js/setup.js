@@ -322,7 +322,9 @@ vscodeExtensions(
   'PeterJausovec.vscode-docker',
   'esbenp.prettier-vscode',
   'passionkind.prettier-vscode-with-tabs',
-  'pnp.polacode'
+  'pnp.polacode',
+  'bierner.lit-html',
+  'bierner.emojisense'
 )
 
 ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
@@ -346,6 +348,19 @@ ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
     "vim.surround": true,
     "go.formatOnSave": true,
     "go.formatTool": "goimports",
+    "emojisense.languages": {
+      "markdown": true,
+      "plaintext": {
+        "markupCompletionsEnabled": false,
+        "emojiDecoratorsEnabled": false
+      },
+      "git-commit": true,
+      "json": true,
+      "javascript": true,
+      "ruby": true,
+      "html": true,
+      "go": true,
+    },
   }
 )
 
