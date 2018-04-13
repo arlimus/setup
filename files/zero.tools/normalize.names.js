@@ -24,6 +24,8 @@ const rename = (dir, bn, nu_bn) => {
   process.stdout.write(colors.green('+'))
 }
 
+const pad = (num, size) => ('000000000' + num).substr(-size);
+
 const normName = (x, apply, stats) => {
   var dir = path.dirname(x)
   var bn = path.basename(x)
@@ -43,6 +45,7 @@ const normName = (x, apply, stats) => {
     r = r.replace(/(.*)\./, "$1"+subex[0]+".").slice(subex[0].length)
   }
 
+  r = r.toLowerCase()
   r = r.replace(/\s+/g, sep)
   r = r.replace(/[\[\({]+/g, sep + '-' + sep)
   r = r.replace(/[\]\)!]+/g, sep)
@@ -55,7 +58,8 @@ const normName = (x, apply, stats) => {
   r = r.replace(/\b\.+$/, '')
   r = r.replace(/1280x720/g, '720p')
   r = r.replace(/1920x1080/g, '1080p')
-  r = r.toLowerCase()
+  r = r.replace(/episode\.(\d+)/, (_, x) => 'episode.'+pad(x, 2))
+
   if(bn != r) r = r.replace(/^[.-]+/, '')
 
   if(bn == r) {
