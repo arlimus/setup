@@ -324,7 +324,9 @@ vscodeExtensions(
   'passionkind.prettier-vscode-with-tabs',
   'pnp.polacode',
   'bierner.lit-html',
-  'bierner.emojisense'
+  'bierner.emojisense',
+  'wayou.vscode-todo-highlight',
+  'wix.vscode-import-cost'
 )
 
 ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
