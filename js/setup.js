@@ -118,12 +118,34 @@ const ensureLines = (path, ...lines) => {
   print.ok(`ensure lines in ${path}`)
 }
 
+const inObject = (item, obj) => {
+  // if both are null we are done
+  if(item == null && obj == null) return true;
+  // this edge-case is just invalid
+  if(item == null || obj == null) return false;
+  if(!item instanceof Object || !obj instanceof Object) return false;
+  // check all fields of item and their values in obj
+  let notEq = Object.keys(item).find(k => obj[k] !== item[k])
+  return !notEq;
+}
+
 const ensureJson = (path, j) => {
   try {
     c = readFile(path, '')
     org = JSON.parse(c)
   } catch(err) {
+    console.log(`Failed to read JSON in ${path} :`)
+    console.log(err)
     org = {}
+  }
+
+  if(Array.isArray(j)) {
+    j.forEach(item => {
+      if(item == null) return;
+      console.log(JSON.stringify(org))
+      let found = org.find(ci => inObject(item, ci))
+      if(!found) org = org.concat(item);
+    })
   }
 
   for(key in j) org[key] = j[key]
@@ -326,7 +348,8 @@ vscodeExtensions(
   'bierner.lit-html',
   'bierner.emojisense',
   'wayou.vscode-todo-highlight',
-  'wix.vscode-import-cost'
+  'wix.vscode-import-cost',
+  'fabiospampinato.vscode-todo-plus'
 )
 
 ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
@@ -364,6 +387,51 @@ ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
       "go": true,
     },
   }
+)
+
+ensureJson(path.join(os.homedir(), '.config/Code/User/keybindings.json'),
+  [
+    {
+      "key": "alt+d",
+      "command": "todo.toggleDone",
+      "when": "editorTextFocus && editorLangId == 'todo'"
+    },
+    {
+      "key": "alt+d",
+      "command": "-todo.toggleDone",
+      "when": "editorTextFocus && editorLangId == 'todo'"
+    },
+    {
+      "key": "alt+c",
+      "command": "todo.toggleCancel",
+      "when": "editorTextFocus && editorLangId == 'todo'"
+    },
+    {
+      "key": "alt+c",
+      "command": "-todo.toggleCancel",
+      "when": "editorTextFocus && editorLangId == 'todo'"
+    },
+    {
+      "key": "alt+s",
+      "command": "todo.start",
+      "when": "editorTextFocus && editorLangId == 'todo'"
+    },
+    {
+      "key": "alt+s",
+      "command": "-todo.start",
+      "when": "editorTextFocus && editorLangId == 'todo'"
+    },
+    {
+      "key": "alt+a",
+      "command": "todo.archive",
+      "when": "editorTextFocus && editorLangId == 'todo'"
+    },
+    {
+      "key": "ctrl+shift+a",
+      "command": "-todo.archive",
+      "when": "editorTextFocus && editorLangId == 'todo'"
+    }
+  ]
 )
 
 // NPM
