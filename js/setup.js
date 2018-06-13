@@ -403,12 +403,12 @@ ensureJson(path.join(os.homedir(), '.config/Code/User/keybindings.json'),
     },
     {
       "key": "alt+c",
-      "command": "todo.toggleCancel",
+      "command": "todo.toggleCancelled",
       "when": "editorTextFocus && editorLangId == 'todo'"
     },
     {
       "key": "alt+c",
-      "command": "-todo.toggleCancel",
+      "command": "-todo.toggleCancelled",
       "when": "editorTextFocus && editorLangId == 'todo'"
     },
     {
