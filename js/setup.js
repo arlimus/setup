@@ -179,7 +179,7 @@ function installArchPackages() {
     // productivity
     'ruby', 'go', 'imagemagick', 'graphicsmagick',
     // configurables
-    'lightdm', 'visual-studio-code-bin',
+    'lightdm', 'code',
   )
   if(process.env.INSTALL_EXTRAS != 'false') {
     package(
@@ -336,7 +336,7 @@ const vscodeExtensions = (...x) =>
 
 vscodeExtensions(
   'vscodevim.vim',
-  'lukehoban.Go',
+  'ms-vscode.go',
   'zxh404.vscode-proto3',
   'dbaeumer.vscode-eslint',
   'HookyQR.beautify',
@@ -352,7 +352,7 @@ vscodeExtensions(
   'fabiospampinato.vscode-todo-plus'
 )
 
-ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
+ensureJson(path.join(os.homedir(), '.config/Code - OSS/User/settings.json'),
   {
     "editor.rulers": [80],
     "editor.tabSize": 2,
@@ -389,7 +389,7 @@ ensureJson(path.join(os.homedir(), '.config/Code/User/settings.json'),
   }
 )
 
-ensureJson(path.join(os.homedir(), '.config/Code/User/keybindings.json'),
+ensureJson(path.join(os.homedir(), '.config/Code - OSS/User/keybindings.json'),
   [
     {
       "key": "alt+d",
