@@ -60,6 +60,7 @@ const normName = (x, apply, stats) => {
   r = r.replace(/1920x1080/g, '1080p')
   r = r.replace(/episode\.(\d+)/, (_, x) => 'episode.'+pad(x, 2))
   r = r.replace(/s(\d\d)e(\d\d)/, (_, s, e) => s + '.' + e)
+  r = r.replace(/\.opus$/g, '.ogg')
 
   if(bn != r) r = r.replace(/^[.-]+/, '')
 

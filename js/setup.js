@@ -390,7 +390,17 @@ ensureJson(path.join(os.homedir(), '.config/Code - OSS/User/settings.json'),
 )
 
 ensureJson(path.join(os.homedir(), '.config/Code - OSS/User/keybindings.json'),
-  [
+	[
+		{
+			"key": "alt+d",
+			"command": "editor.action.goToDeclaration",
+			"when": "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor"
+		},
+		{
+			"key": "f12",
+			"command": "-editor.action.goToDeclaration",
+			"when": "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor"
+		},
     {
       "key": "alt+d",
       "command": "todo.toggleDone",
