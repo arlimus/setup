@@ -26,6 +26,18 @@ const rename = (dir, bn, nu_bn) => {
 
 const pad = (num, size) => ('000000000' + num).substr(-size);
 
+const minifySuffix = (s) => {
+  let suffix = s.match(/\.([^.]+)$/)
+  if(suffix == null) return s;
+  let encoding = s.match(/x26[45]/)
+  let resolution = s.match(/\b(\d+\d\dp)\./)
+
+  let res = ''
+  if(resolution != null) res += resolution[1] + '.';
+  if(encoding != null) res += encoding[0] + '.';
+  return res + suffix[1]
+}
+
 const normName = (x, apply, stats) => {
   var dir = path.dirname(x)
   var bn = path.basename(x)
@@ -58,9 +70,14 @@ const normName = (x, apply, stats) => {
   r = r.replace(/\b\.+$/, '')
   r = r.replace(/1280x720/g, '720p')
   r = r.replace(/1920x1080/g, '1080p')
+  r = r.replace(/\.opus$/g, '.ogg')
   r = r.replace(/episode\.(\d+)/, (_, x) => 'episode.'+pad(x, 2))
   r = r.replace(/s(\d\d)e(\d\d)/, (_, s, e) => s + '.' + e)
-  r = r.replace(/\.opus$/g, '.ogg')
+
+  if(process.env.MINI === "true") {
+    r = r.replace(/(episode\.\d+\.)(.*)/, (_, x, s) => x + minifySuffix(s))
+    r = r.replace(/(\.\d\d\.\d\d\.)(.*)/, (_, x, s) => x + minifySuffix(s))
+  }
 
   if(bn != r) r = r.replace(/^[.-]+/, '')
 
