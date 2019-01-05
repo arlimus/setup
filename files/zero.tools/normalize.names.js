@@ -29,8 +29,9 @@ const pad = (num, size) => ('000000000' + num).substr(-size);
 const minifySuffix = (s) => {
   let suffix = s.match(/\.([^.]+)$/)
   if(suffix == null) return s;
+
   let encoding = s.match(/x26[45]/)
-  let resolution = s.match(/\b(\d+\d\dp)\./)
+  let resolution = s.match(/\b(\d+\d\dp)\b/) // 480p, 720p, 1080p, ...
 
   let res = ''
   if(resolution != null) res += resolution[1] + '.';
