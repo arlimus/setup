@@ -256,6 +256,7 @@ const configureZshrc = () => {
   ensure('alias b="bundle exec"')
   ensure('alias ya="youtube-dl -f bestaudio --audio-quality 0 -i -x --extract-audio"')
   ensure('alias yav="youtube-dl -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"')
+  ensure('alias y="yay --color auto"')
   fs.writeFileSync(zshrc, c)
 }
 configureZshrc()
