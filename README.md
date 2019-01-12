@@ -21,6 +21,14 @@ Tiny bootstrap script **which must be run as root**: [arch.bootstrap.sh](arch.bo
 
 (run a test via `docker build --file arch.dockerfile . --rm -t arlimus/setup:latest`)
 
+```
+# set up the core OS
+node setup/cli.js
+
+# set up all packages including UI stuff and parallels tools
+node setup/all.js
+```
+
 
 ## Configuration
 
