@@ -46,15 +46,15 @@ const installRun = (cmd, list) => {
   return false;
 }
 const brewInstall = x => installRun(`brew install ${x.join(' ')}`, x)
-const yaourtInstall = (...x) => installRun(`yaourt -S --needed --noconfirm ${x.join(' ')}`, x)
+const yayInstall = (...x) => installRun(`yay -S --needed --noconfirm ${x.join(' ')}`, x)
 const isOsx = /^darwin/.test(process.platform)
-const isArch = process.platform == 'linux' && fs.existsSync('/usr/bin/yaourt') 
+const isArch = process.platform == 'linux' && fs.existsSync('/usr/bin/yay')
 const cannotInstall = x =>
   print.err(`Cannot detect OS to install ${x}`) &&
   shell.exit(1)
 const package = 
   isOsx ? brewInstall :
-  isArch ? yaourtInstall :
+  isArch ? yayInstall :
   cannotInstall
 
 const install = (what, exists, installF) => {

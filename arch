@@ -10,37 +10,28 @@ fi
 sudo echo "[ok] sudo works" || exit 1
 LOC="$(pwd)"
 
-install_yaourt() {
-  echo "====> Install yaourt"
-  echo "----> 1/3 install requirements"
-  sudo pacman -S --needed --noconfirm base-devel
+install_yay() {
+  echo "====> Install yay"
+  echo "----> 1/2 install requirements"
+  sudo pacman -S --needed --noconfirm base-devel git
 
-  echo "----> 2/3 aur package-query"
-  dir="/tmp/package-query"
-  sudo rm -rf $dir; mkdir -p $dir && cd $dir
-  curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/package-query.tar.gz
-  tar -xvzf package-query.tar.gz 
-  cd package-query
-  makepkg --noconfirm -si
-
-  echo "----> 3/3 aur yaourt"
-  dir="/tmp/yaourt"
-  sudo rm -rf $dir; mkdir -p $dir && cd $dir
-  curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/yaourt.tar.gz
-  tar -xvzf yaourt.tar.gz 
-  cd yaourt
+  echo "----> 2/2 aur yay"
+  dir="/tmp/yay"
+  sudo rm -rf $dir
+  git clone https://aur.archlinux.org/yay.git /tmp/yay
+  cd /tmp/yay
   makepkg --noconfirm -si
   cd "$LOC"
 }
-if command -v yaourt > /dev/null; then
-  echo "[ok] yaourt is installed"
+if command -v yay > /dev/null; then
+  echo "[ok] yay is installed"
 else
-  install_yaourt
+  install_yay
 fi
 
 install_node() {
   echo "====> Install node"
-  yaourt -S --noconfirm nodejs npm yarn
+  yay -S --noconfirm nodejs npm yarn
 }
 if command -v node > /dev/null && \
    command -v npm > /dev/null && \
