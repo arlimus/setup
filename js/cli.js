@@ -1,7 +1,7 @@
 const setup = require('./lib.js');
 
 if(setup.isOsx) { 
-  setup.installOsxPackages() 
+  setup.installOsxBase()
 }
 
 if(setup.isArch) {

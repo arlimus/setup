@@ -4,5 +4,6 @@ if(setup.isArch) {
   setup.installArchBoot()
 }
 
-require('./zll.jx')
-
+if(setup.isOsx) {
+  setup.installOsxBase()
+}

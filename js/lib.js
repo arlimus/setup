@@ -47,10 +47,12 @@ const installRun = (cmd, list) => {
 }
 const brewInstall = x => installRun(`brew install ${x.join(' ')}`, x)
 const yayInstall = (...x) => installRun(`yay -S --needed --noconfirm ${x.join(' ')}`, x)
+
 const isOsx = /^darwin/.test(process.platform);
 exports.isOsx = isOsx;
-const isArch = process.platform == 'linux' && fs.existsSync('/usr/bin/yay');
+const isArch = process.platform == 'linux' && fs.existsSync('/usr/bin/pacman');
 exports.isArch = isArch;
+
 const cannotInstall = x =>
   print.err(`Cannot detect OS to install ${x}`) &&
   shell.exit(1)
@@ -138,7 +140,7 @@ const ensureJson = (path, j) => {
   } catch(err) {
     console.log(`Failed to read JSON in ${path} :`)
     console.log(err)
-    org = {}
+    return
   }
 
   if(Array.isArray(j)) {
@@ -157,13 +159,10 @@ const ensureJson = (path, j) => {
 
 
 // OSX
-exports.installOsxPackages = () => {
-  install('brew', () => commandExists('brew'), () => run(
-    '/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"'
-  ))
-  installCmd('ag')
+exports.installOsxBase = () => {
   installCmd('zsh')
-  installCmd('the_silver_searcher', 'ag')
+  installCmd('git')
+  //installCmd('the_silver_searcher', 'ag')
 }
 
 // Arch
@@ -177,10 +176,12 @@ exports.installArchBoot = () => {
     'i3', 'xfce4-terminal', 'compton', 'dmenu', 'dunst',
     'gnome-settings-daemon', 'feh', 'udiskie', 'android-tools',
     // web
+    'networkmanager', 'network-manager-applet',
     'firefox', 'chromium',
     // productivity
     'gimp', 'telegram-desktop-bin', 'slack-desktop',
     'gthumb', 'gnome-screenshot', 'evince', 'mediainfo',
+    'docker',
   )
 
   configureLightdm = () => {
@@ -207,10 +208,17 @@ exports.installArchBoot = () => {
 
 // Arch core
 exports.installArchCore = () => {
+  const installYay = () => {
+    run("pacman -S --noconfirm git sudo base-devel")
+    run("useradd builduser -m && passwd -d builduser && echo 'builduser ALL=(ALL) ALL' >> /etc/sudoers && echo 'root ALL=(ALL) ALL' >> /etc/sudoers")
+    run("sudo -u builduser bash -c 'git clone https://aur.archlinux.org/yay.git /tmp/yay && cd /tmp/yay && makepkg -si --noconfirm'")
+  }
+  install('yay', () => fs.existsSync('/usr/bin/yay'), installYay)
+
   package(
     // basics
     'git', 'vim', 'vim-surround', 'curl', 'htop', 'p7zip', 'encfs',
-    'openssh', 'sshfs', 'networkmanager', 'network-manager-applet', 'tree',
+    'openssh', 'sshfs', 'tree', 'net-tools',
     // deps for parallels tools
     'base-devel', 'python2', 'nodejs', 'npm', 'yarn', 'python-pip',
     // cli tools
@@ -218,7 +226,7 @@ exports.installArchCore = () => {
     // productivity
     'ruby', 'go', 'imagemagick', 'graphicsmagick',
     // configurables
-    'code', 'meld', 'colordiff', 'docker', 'httpie', 'protobuf', 'rsync',
+    'code', 'meld', 'colordiff', 'httpie', 'protobuf', 'rsync',
     'inotify-tools', 'youtube-dl', 'x265', 'mpv', 'alsa-utils',
     'vorbis-tools', 'opus-tools',
   )
@@ -446,10 +454,6 @@ exports.installDevEnv = () => {
       }
     ]
   )
-
-  // NPM
-  install('eslint', () => commandExists('eslint'), () => run('sudo npm install -g eslint'))
-  install('gulp', () => commandExists('gulp'), () => run('sudo npm install -g gulp'))
 
   // Go
   install('goimports', () => commandExists('goimports'), () => run('go get golang.org/x/tools/cmd/goimports'))
