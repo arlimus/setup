@@ -179,7 +179,7 @@ exports.installArchBoot = () => {
     'networkmanager', 'network-manager-applet',
     'firefox', 'chromium',
     // productivity
-    'gimp', 'telegram-desktop-bin', 'slack-desktop',
+    //'gimp', 'telegram-desktop-bin', 'slack-desktop',
     'gthumb', 'gnome-screenshot', 'evince', 'mediainfo',
     'docker',
   )
