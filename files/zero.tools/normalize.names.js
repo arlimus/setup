@@ -44,13 +44,15 @@ const normName = (x, apply, stats) => {
   var bn = path.basename(x)
   var r = bn
 
+  // prefix _groupname__rest.typ  ==> rest.groupname.typ
   var subex = r.match(/^_(.+?)__/)
   if(subex != null) {
     r = r.replace(/(.*)\./, "$1"+subex[1]+".").slice(subex[0].length)
   }
 
   // if the name only separates by _ instead of . we replace all those first
-  if(r.match(/\.[^.]+\./) == null) {
+  const nonBracketR = r.replace(/\(.+?\)/g, '');
+  if(nonBracketR.match(/\.[^.]+\./) == null) {
     r = r.replace(/[_]+/g, '.')
   }
   r = r.replace(/\x84/g, "ä")
