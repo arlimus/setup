@@ -8,7 +8,7 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^2.3.0",
-    "inquirer": "^4.0.1",
+    "inquirer": "^6.4.1",
     "shelljs": "^0.8.3"
   }
 }
