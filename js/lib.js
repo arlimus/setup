@@ -204,6 +204,8 @@ exports.installArchBoot = () => {
     console.error("Please install parallels tools manually!")
   }
   install('parallels-tools', () => fs.existsSync('/usr/lib/parallels-tools/version'), () => installParallelsTools())
+
+  syncFiles('inco.desktop', '/usr/share/applications/inco.desktop')
 }
 
 // Arch core
