@@ -173,7 +173,7 @@ exports.installArchBoot = () => {
     'xorg', 'lightdm', 'xf86-video-vesa', 'mesa-libgl', 'lightdm-deepin-greeter',
     'gnome-keyring', 'arc-gtk-theme',
     // i3
-    'i3', 'xfce4-terminal', 'compton', 'dmenu', 'dunst',
+    'i3', 'xfce4-terminal', 'compton', 'rofi', 'rofimoji', 'dunst',
     'gnome-settings-daemon', 'feh', 'udiskie', 'android-tools',
     // web
     'networkmanager', 'network-manager-applet',
