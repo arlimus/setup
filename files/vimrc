@@ -1,12 +1,14 @@
 syntax enable
 colorscheme monokai
 
+set t_ut=
+
+filetype plugin indent on
 set autoindent
 set smartindent
 set tabstop=2
 set shiftwidth=2
 set expandtab
 set paste
-set t_ut=
 
 inoremap kj <Esc>

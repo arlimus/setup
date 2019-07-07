@@ -180,7 +180,7 @@ exports.installArchBoot = () => {
     'firefox', 'chromium',
     // productivity
     //'gimp', 'telegram-desktop-bin', 'slack-desktop',
-    'gthumb', 'gnome-screenshot', 'evince', 'mediainfo',
+    'gthumb', 'gnome-screenshot', 'zathura', 'zathura-pdf-mupdf', 'zathura-cb', 'mediainfo',
     'docker',
   )
 
