@@ -288,6 +288,10 @@ exports.installCore = () => {
   const configureI3 = () => syncFiles('i3.config', path.join(os.homedir(), '.i3/config'))
   install('i3-config', false, configureI3)
 
+  // rofi
+  const configureRofi = () => syncFiles('rofi', path.join(os.homedir(), '.config/rofi'))
+  install('rofi-config', false, configureRofi)
+
   // compton
   const configureCompton = () => syncFiles('compton.conf', path.join(os.homedir(), '.config/compton.conf'))
   install('compton conf', false, configureCompton)
