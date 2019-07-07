@@ -9,6 +9,6 @@ set smartindent
 set tabstop=2
 set shiftwidth=2
 set expandtab
-set paste
+" set paste  " deactivated by default, as it conflicts with expandtab
 
 inoremap kj <Esc>
