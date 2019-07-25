@@ -83,6 +83,7 @@ const normName = (x, apply, stats) => {
   r = r.replace(/\.opus$/g, '.ogg')
   r = r.replace(/episode\.(\d+)/, (_, x) => 'episode.'+pad(x, 2))
   r = r.replace(/s(\d\d)[._-]?e(\d\d)/, (_, s, e) => s + '.' + e)
+  r = r.replace(/season[.]?(\d+)[._-]?episode[.]?(\d+)/, (_, s, e) => s + '.' + e)
   r = r.replace(/\.(dvdrip|xvid)(-[a-z0-9]+)*/g, '')
 
   if(process.env.MINI === "true") {
