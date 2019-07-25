@@ -60,9 +60,11 @@ const normName = (x, apply, stats) => {
        .replace(/\x94/g, "ö")
 
   // grabbing prefix expressions on some files like: "[nano] file name" => "nano"
-  var subex = r.match(/^\[.+?\]/)
+  var subex = r.match(/^\[(.+?)\]/)
   if(subex != null) {
-    r = r.replace(/(.*)\./, "$1"+subex[0]+".").slice(subex[0].length)
+    let old = subex[1];
+    let nu = old.replace(/\.[a-z]{3}$/, '');
+    r = r.replace(/(.*)\./, "$1."+nu+".").slice(subex[0].length);
   }
 
   r = r.toLowerCase()
