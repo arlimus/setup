@@ -44,6 +44,12 @@ const normName = (x, apply, stats) => {
   var bn = path.basename(x)
   var r = bn
 
+  // for all partial files we don't want to rename them, as they are still in progress
+  if(r.endsWith('.part')) {
+    if(stats != null) stats.unchanged.push(colors.yellow(`${r} (unchanged)`))
+    return
+  }
+
   // prevent incorrectly encoded characters from showing up
   r = r.replace(/\x84/g, "ä")
        .replace(/\x81/g, "ü")
