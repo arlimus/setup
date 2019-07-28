@@ -44,22 +44,33 @@ const normName = (x, apply, stats) => {
   var bn = path.basename(x)
   var r = bn
 
-  // prefix _groupname__rest.typ  ==> rest.groupname.typ
+  // prevent incorrectly encoded characters from showing up
+  r = r.replace(/\x84/g, "ä")
+       .replace(/\x81/g, "ü")
+       .replace(/\x94/g, "ö")
+
+  // we don't want prefixes to screw us up + categorize them:
+  //   _groupname__rest.typ  =!!=>  .groupname.rest.typ
+  // so rename instead
+  //   _groupname__rest.typ  ====>  rest.groupname.typ
+  // must appear before the `_` => `.` change so that the prefix is caught accurately
   var subex = r.match(/^_(.+?)__/)
   if(subex != null) {
     r = r.replace(/(.*)\./, "$1"+subex[1]+".").slice(subex[0].length)
   }
 
-  // if the name only separates by _ instead of . we replace all those first
+  // if the name only separates by `_` instead of `.` we replace all those first
+  //   this_is_my_name.txt  ====>  this.is.my.name.txt
+  // this is done so the other optimizations still work as expected and we get rid of `_`
   const nonBracketR = r.replace(/\(.+?\)/g, '');
   if(nonBracketR.match(/\.[^.]+\./) == null) {
     r = r.replace(/[_]+/g, '.')
   }
-  r = r.replace(/\x84/g, "ä")
-       .replace(/\x81/g, "ü")
-       .replace(/\x94/g, "ö")
 
-  // grabbing prefix expressions on some files like: "[nano] file name" => "nano"
+  // we want the bracketed `[..]` prefix to be used as a grouping suffix
+  //   [groupname].rest.typ  ====>  rest.groupname.typ
+  // these groupnames distract from the actual filename so should be added towards the end
+  // must appear after the `_` => `.` change to prevent it from not working
   var subex = r.match(/^\[(.+?)\]/)
   if(subex != null) {
     let old = subex[1];
