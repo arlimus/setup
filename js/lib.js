@@ -240,6 +240,8 @@ exports.installArchCore = () => {
   ensureLines("/etc/security/limits.conf", "* hard core 0")
   syncFiles('coredump.conf', '/etc/systemd/coredump.conf.d/custom.conf')
   install('inco', () => fs.existsSync('/usr/local/bin/inco'), () => syncFiles('inco.sh', '/usr/local/bin/inco'))
+  install('gsa', () => fs.existsSync('/usr/local/bin/gsa'), () => syncFiles('gsa.sh', '/usr/local/bin/gsa'))
+  install('gsac', () => fs.existsSync('/usr/local/bin/gsac'), () => syncFiles('gsac.sh', '/usr/local/bin/gsac'))
 }
 
 exports.configureZshrc = () => {
