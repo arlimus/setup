@@ -99,6 +99,7 @@ const normName = (x, apply, stats) => {
   r = r.replace(/1920x1080/g, '1080p')
   r = r.replace(/\.opus$/g, '.ogg')
   r = r.replace(/s(\d\d)[._-]?e(\d\d)/, (_, s, e) => s + '.' + e)
+  r = r.replace(/s(\d\d?)[.][-][.](\d\d)/, (_, s, e) => pad(s,2) + '.' + e)
   r = r.replace(/season[.]?(\d+)[._-]?episode[.]?(\d+)/, (_, s, e) => pad(s,2) + '.' + pad(e,2))
   r = r.replace(/episode\.(\d+)/, (_, x) => '01.'+pad(x, 2))
   r = r.replace(/\.(dvdrip|xvid)(-[a-z0-9]+)*/g, '')
