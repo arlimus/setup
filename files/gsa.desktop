@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=gsac screenshot
+Comment=Save a screenshot of a selected area of your screen to ~/Screenshots
+Keywords=screenshot;capture;
+Exec=gsa
+Terminal=false
+Type=Application
+Icon=org.gnome.Screenshot
+StartupNotify=true
+Categories=KDE;GTK;GNOME;Utility;X-GNOME-Utilities;
+DBusActivatable=true
+Exec=/usr/local/bin/gsa

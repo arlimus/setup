@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=gsac screenshot to clipboard
+Comment=Save a screenshot of a selected area of your screen to the clipboard
+Keywords=screenshot;capture;
+Exec=gsac
+Terminal=false
+Type=Application
+Icon=org.gnome.Screenshot
+StartupNotify=true
+Categories=KDE;GTK;GNOME;Utility;X-GNOME-Utilities;
+DBusActivatable=true
+Exec=/usr/local/bin/gsac

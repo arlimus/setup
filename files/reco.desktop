@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=reco screenrecording
+Comment=Save a recording of a selected area of your screen
+Keywords=screenrecording;capture;
+Exec=reco
+Terminal=false
+Type=Application
+Icon=org.gnome.Screenshot
+StartupNotify=true
+Categories=KDE;GTK;GNOME;Utility;X-GNOME-Utilities;
+DBusActivatable=true
+Exec=/usr/local/bin/reco
