@@ -4,11 +4,24 @@ const inquirer = require('inquirer');
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob').sync;
-var files = process.argv.slice(2)
 
-if(files.length == 0) {
-  files = ['.']
-}
+const Config = {
+  mini: false
+};
+
+const args = process.argv.slice(2);
+const files = [];
+args.forEach((arg) => {
+  switch (arg) {
+    case '-mini':
+      Config.mini = true;
+      break;
+    default:
+      files.push(args)
+  }
+})
+
+if(files.length == 0) files.push('.');
 
 const sep = '.'
 const _s = (len, unit) => '' + len + ' ' + unit + ((len > 1) ? 's' : '')
@@ -104,7 +117,7 @@ const normName = (x, apply, stats) => {
   r = r.replace(/episode\.(\d+)/, (_, x) => '01.'+pad(x, 2))
   r = r.replace(/\.(dvdrip|xvid)(-[a-z0-9]+)*/g, '')
 
-  if(process.env.MINI === "true") {
+  if(Config.mini) {
     r = r.replace(/(episode\.\d+\.)(.*)/, (_, x, s) => x + minifySuffix(s))
     r = r.replace(/(\.\d\d\.\d\d\.)(.*)/, (_, x, s) => x + minifySuffix(s))
   }
