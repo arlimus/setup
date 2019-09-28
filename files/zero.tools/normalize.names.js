@@ -13,6 +13,10 @@ const args = process.argv.slice(2);
 const files = [];
 args.forEach((arg) => {
   switch (arg) {
+    case '-h':
+      console.log("options:")
+      console.log("  -mini     ... minify")
+      process.exit()
     case '-mini':
       Config.mini = true;
       break;
