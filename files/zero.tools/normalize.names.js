@@ -56,7 +56,7 @@ const minifySuffix = (s) => {
   return res + suffix[1]
 }
 
-const normName = (x, apply, stats) => {
+const normName = (x, mode, apply, stats) => {
   var dir = path.dirname(x)
   var bn = path.basename(x)
   var r = bn
@@ -136,18 +136,52 @@ const normName = (x, apply, stats) => {
     if(stats != null) stats.rename.push(`${colors.blue(bn)}  -->  ${colors.cyan(r)}`)
   }
 }
+
+const updateFileModes = (folder, files, mode) => {
+  const extensions = {}
+  files.forEach(f => extensions[path.extname(f).slice(1)] = true)
+
+  if (!extensions.pdf) {
+    return
+  }
+
+  delete(extensions.pdf)
+  delete(extensions.rar)
+  delete(extensions.zip)
+
+  if (Object.keys(extensions).length !== 0) {
+    console.log("mixed files in folder, not a pdf collection")
+    return
+  }
+
+  const folderName = path.basename(path.resolve(folder))
+
+  files.forEach((file) => {
+    const ext = path.extname(file)
+    if (ext !== '.pdf') return;
+    mode[file] = {prefix: folderName + '.-.'}
+  })
+}
+
 const flatten = x => [].concat.apply([], x.filter(i=>i))
-const expandFiles = files => flatten(files.map(x => {
-  stat = fs.statSync(x);
-  if(stat.isFile()) return x;
+
+const expandFile = (file, mode) => {
+  stat = fs.statSync(file);
+  if(stat.isFile()) return file;
   if(!stat.isDirectory()) {
-    console.log(colors.red(`Cannot process ${x}, it is not a file nor a directory`))
+    console.log(colors.red(`Cannot process ${file}, it is not a file nor a directory`))
     return null;
   }
-  nu = expandFiles(glob(x + '/*'))
-  nu.push(x)
+
+  let nuFiles = glob(file + '/*')
+  updateFileModes(file, nuFiles, mode)
+
+  nu = expandFiles(nuFiles, mode)
+  nu.push(file)
   return nu
-}))
+}
+
+const expandFiles = (files, mode) => flatten(files.map(x => expandFile(x, mode)))
 
 const printStats = stats => {
   if(stats == null) return;
@@ -157,11 +191,12 @@ const printStats = stats => {
 
 console.log(colors.green(`Input: ${_s(files.length, 'file')}`))
 
-xfiles = expandFiles(files)
+var mode = {}
+xfiles = expandFiles(files, mode)
 console.log(colors.green(`Expanded files: ${_s(xfiles.length, 'xfiles')}`))
 
 var stats = { rename: [], unchanged: [] }
-xfiles.forEach(x => normName(x, false, stats))
+xfiles.forEach(x => normName(x, mode, false, stats))
 
 printStats(stats)
 if(stats.rename.length === 0) {
@@ -176,7 +211,7 @@ inquirer.prompt({ type: 'confirm', name: 'rename',
     console.log("Aborting.")
     process.exit(0)
   }
-  xfiles.forEach(x => normName(x, true))
+  xfiles.forEach(x => normName(x, mode, true))
   console.log(colors.green("All done."))
   process.exit(0)
 })
