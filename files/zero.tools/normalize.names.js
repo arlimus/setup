@@ -126,6 +126,14 @@ const normName = (x, mode, apply, stats) => {
     r = r.replace(/(\.\d\d\.\d\d\.)(.*)/, (_, x, s) => x + minifySuffix(s))
   }
 
+  const fMode = mode[x]
+  if (fMode != null) {
+    const parts = fMode.prefix.split(/[^a-zA-Z0-9]+/)
+    parts.forEach(part => r = r.replace(part, ''))
+    r = fMode.prefix + r.replace(/^[^A-Za-z0-9]+/, '')
+    r = r.replace(/[.][.]+/, '.')
+  }
+
   if(bn != r) r = r.replace(/^[.-]+/, '')
 
   if(bn == r) {
@@ -135,6 +143,8 @@ const normName = (x, mode, apply, stats) => {
     if(apply) return rename(dir, bn, r)
     if(stats != null) stats.rename.push(`${colors.blue(bn)}  -->  ${colors.cyan(r)}`)
   }
+
+  return r
 }
 
 const updateFileModes = (folder, files, mode) => {
@@ -155,11 +165,12 @@ const updateFileModes = (folder, files, mode) => {
   }
 
   const folderName = path.basename(path.resolve(folder))
+  const prefix = normName(folderName, {}, false, null) + '.-.'
 
   files.forEach((file) => {
     const ext = path.extname(file)
     if (ext !== '.pdf') return;
-    mode[file] = {prefix: folderName + '.-.'}
+    mode[file] = { prefix }
   })
 }
 
