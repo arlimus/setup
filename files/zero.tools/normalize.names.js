@@ -56,6 +56,23 @@ const minifySuffix = (s) => {
   return res + suffix[1]
 }
 
+const seasons = {
+  spring: 'q1',
+  summer: 'q2',
+  fall: 'q3',
+  winter: 'q4',
+}
+
+const months = {
+  'january.february': '01+02',
+  'march.april': '03+04',
+  'may.june': '05+06',
+  'july.august': '07+08',
+  'september.october': '09+10',
+  'november.december': '11+12',
+}
+const monthsRegex = RegExp('('+Object.keys(months).join('|')+').(\\d\\d\\d\\d)')
+
 const normName = (x, mode, apply, stats) => {
   var dir = path.dirname(x)
   var bn = path.basename(x)
@@ -119,6 +136,8 @@ const normName = (x, mode, apply, stats) => {
   r = r.replace(/s(\d\d?)[.][-][.](\d\d)/, (_, s, e) => pad(s,2) + '.' + e)
   r = r.replace(/season[.]?(\d+)[._-]?episode[.]?(\d+)/, (_, s, e) => pad(s,2) + '.' + pad(e,2))
   r = r.replace(/episode\.(\d+)/, (_, x) => '01.'+pad(x, 2))
+  r = r.replace(/(spring|summer|fall|winter).(\d\d\d\d)/, (_, x, y) => y + "." + seasons[x] + "." + x )
+  r = r.replace(monthsRegex, (_, x, y) => y + "." + months[x] )
   r = r.replace(/\.(dvdrip|xvid)(-[a-z0-9]+)*/g, '')
 
   if(Config.mini) {
