@@ -29,7 +29,7 @@ ylater() {
 }
 
 ylaterw() {
-  last=""
+  last="$(xclip -selection clipboard -o)"
   while true; do
     cur="$(xclip -selection clipboard -o)"
     sleep 0.3
