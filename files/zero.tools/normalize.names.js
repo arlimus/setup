@@ -6,24 +6,42 @@ const path = require('path');
 const glob = require('glob').sync;
 
 const Config = {
-  mini: false
+  mini: false,
+  replace: [],
 };
 
 const args = process.argv.slice(2);
 const files = [];
-args.forEach((arg) => {
+
+for(let i = 0; i < args.length; i++) {
+  let arg = args[i];
   switch (arg) {
     case '-h':
       console.log("options:")
       console.log("  -mini     ... minify")
+      console.log("  -i        ... interactive")
       process.exit()
+    case '-r':
+      if (i+2 >= args.length) {
+        console.log("not enough arguments for replacement, need 2")
+      }
+
+      const m = {
+        old: args[i+1],
+        nu: args[i+2],
+      };
+      Config.replace.push(m);
+
+      i += 2;
+      console.log(`replace "${m.old}" => "${m.nu}"`)
+      break;
     case '-mini':
       Config.mini = true;
       break;
     default:
       files.push(args)
   }
-})
+}
 
 if(files.length == 0) files.push('.');
 
@@ -154,6 +172,10 @@ const normName = (x, mode, apply, stats) => {
   }
 
   if(bn != r) r = r.replace(/^[.-]+/, '')
+
+  Config.replace.forEach(m => {
+    r = r.replace(m.old, m.nu)
+  })
 
   if(bn == r) {
     if(apply) return process.stdout.write(colors.gray('='))
