@@ -226,7 +226,7 @@ exports.installArchCore = () => {
     // cli tools
     'zsh', 'the_silver_searcher', 'jq', 'ttf-inconsolata',
     // productivity
-    'ruby', 'go', 'imagemagick', 'graphicsmagick',
+    'ruby', 'go', 'imagemagick', 'graphicsmagick', 'maim', 'xclip',
     // configurables
     'code', 'meld', 'colordiff', 'httpie', 'protobuf', 'rsync',
     'inotify-tools', 'youtube-dl', 'x265', 'mpv', 'alsa-utils',
