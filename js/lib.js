@@ -292,7 +292,10 @@ exports.installCore = () => {
   install('i3-config', false, configureI3)
 
   // rofi
-  const configureRofi = () => syncFiles('rofi', path.join(os.homedir(), '.config/rofi'))
+  const configureRofi = () => {
+    syncFiles('rofi/config.rasi', path.join(os.homedir(), '.config/rofi/config.rasi')
+    syncFiles('rofi/zero.rasi', path.join(os.homedir(), '.config/rofi/zero.rasi')
+  })
   install('rofi-config', false, configureRofi)
 
   // compton
