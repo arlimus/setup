@@ -381,22 +381,29 @@ exports.installDevEnv = () => {
       "editor.rulers": [80],
       "editor.tabSize": 2,
       "editor.insertSpaces": true,
-      "vim.useCtrlKeys": false,
       "vim.overrideCopy": false,
       "vim.insertModeKeyBindings": [
-          {
-              "before": ["k", "j"],
-              "after": ["<Esc>"]
-          },
-          {
-              "before": ["j", "k"],
-              "after": ["<Esc>"]
-          }
+        {
+          "before": ["k", "j"],
+          "after": ["<Esc>"]
+        },
+        {
+          "before": ["j", "k"],
+          "after": ["<Esc>"]
+        }
       ],
+      "vim.useCtrlKeys": true,
       "vim.autoindent": true,
       "vim.surround": true,
+      "vim.handleKeys": {
+        "<C-c>": false,
+        "<C-x>": false,
+        "<C-v>": false,
+      },
       "go.formatOnSave": true,
-      "go.formatTool": "goimports",
+      "go.toolsEnvVars": {
+        "GO111MODULE": "on",
+      },
       "emojisense.languages": {
         "markdown": true,
         "plaintext": {
@@ -405,7 +412,9 @@ exports.installDevEnv = () => {
         },
         "git-commit": true,
         "json": true,
+        "yaml": true,
         "javascript": true,
+        "typescript": true,
         "ruby": true,
         "html": true,
         "go": true,
