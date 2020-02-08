@@ -197,6 +197,8 @@ exports.installArchBoot = () => {
   install('configure lightdm', false, configureLightdm)
   run('sudo systemctl enable lightdm')
   run('sudo systemctl enable NetworkManager')
+  run('sudo systemctl enable docker')
+  run('sudo systemctl start docker')
 
   run('sudo ln -sf /usr/lib/systemd/scripts/ /etc/init.d')
   run('sudo touch /etc/X11/xorg.conf')
