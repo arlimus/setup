@@ -190,6 +190,7 @@ exports.installArchBoot = () => {
     c = c.replace(/^#?greeter-session=.*/m, 'greeter-session=lightdm-deepin-greeter')
     syncFiles('xrandr.resize', '/usr/local/bin/xrandr.resize')
     c = c.replace(/^#?display-setup-script=.*/m, `display-setup-script=xrandr.resize`)
+    c = c.replace(/^#?user-session=.*/m, `user-session=i3`)
     fs.writeFileSync('/tmp/lightdmconf', c)
     run(`sudo mv /tmp/lightdmconf ${p}`)
   }
