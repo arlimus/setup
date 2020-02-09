@@ -404,6 +404,7 @@ exports.installDevEnv = () => {
         "<C-f>": false,
         "<C-w>": false,
         "<C-d>": false,
+        "<C-h>": false,
       },
       "go.formatOnSave": true,
       "go.toolsEnvVars": {
