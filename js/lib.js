@@ -247,6 +247,7 @@ exports.installArchCore = () => {
   install('gsac', () => fs.existsSync('/usr/local/bin/gsac'), () => syncFiles('gsac.sh', '/usr/local/bin/gsac'))
   install('reco', () => fs.existsSync('/usr/local/bin/reco'), () => syncFiles('reco.sh', '/usr/local/bin/reco'))
   install('ylater', () => fs.existsSync('/usr/local/bin/ylater'), () => syncFiles('ylater.sh', '/usr/local/bin/ylater'))
+  install('ylaterw', () => fs.existsSync('/usr/local/bin/ylaterw'), () => syncFiles('ylaterw.sh', '/usr/local/bin/ylaterw'))
 }
 
 exports.configureZshrc = () => {
