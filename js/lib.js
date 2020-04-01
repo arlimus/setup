@@ -484,6 +484,14 @@ exports.installDevEnv = () => {
         "key": "ctrl+shift+a",
         "command": "-todo.archive",
         "when": "editorTextFocus && editorLangId == 'todo'"
+      },
+      {
+        "key": "ctrl+pagedown",
+        "command": "workbench.action.nextEditor"
+      },
+      {
+        "key": "ctrl+pageup",
+        "command": "workbench.action.previousEditor"
       }
     ]
   )
