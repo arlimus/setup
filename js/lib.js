@@ -170,7 +170,7 @@ const resolution = '1920x1200'
 exports.installArchBoot = () => {
   package(
     // ui basics
-    'xorg', 'lightdm', 'xf86-video-vesa', 'mesa-libgl', 'lightdm-deepin-greeter',
+    'xorg', 'lightdm', 'mesa-libgl', 'lightdm-slick-greeter', 'lightdm-settings',
     'gnome-keyring', 'arc-gtk-theme',
     // i3
     'i3', 'xfce4-terminal', 'compton', 'rofi', 'rofimoji', 'dunst',
@@ -187,7 +187,7 @@ exports.installArchBoot = () => {
   configureLightdm = () => {
     p = '/etc/lightdm/lightdm.conf'
     c = fs.readFileSync(p, 'utf-8')
-    c = c.replace(/^#?greeter-session=.*/m, 'greeter-session=lightdm-deepin-greeter')
+    c = c.replace(/^#?greeter-session=.*/m, 'greeter-session=lightdm-slick-greeter')
     syncFiles('xrandr.resize', '/usr/local/bin/xrandr.resize')
     c = c.replace(/^#?display-setup-script=.*/m, `display-setup-script=xrandr.resize`)
     c = c.replace(/^#?user-session=.*/m, `user-session=i3`)
