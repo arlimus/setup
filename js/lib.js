@@ -492,6 +492,10 @@ exports.installDevEnv = () => {
       {
         "key": "ctrl+pageup",
         "command": "workbench.action.previousEditor"
+      },
+      {
+        "key": "ctrl+a",
+        "command": "editor.action.selectAll"
       }
     ]
   )
