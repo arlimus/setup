@@ -227,7 +227,7 @@ exports.installArchCore = () => {
     // deps for parallels tools
     'base-devel', 'python2', 'nodejs', 'npm', 'yarn', 'python-pip',
     // cli tools
-    'zsh', 'the_silver_searcher', 'jq', 'ttf-inconsolata',
+    'zsh', 'the_silver_searcher', 'jq', 'yq', 'ttf-inconsolata',
     // productivity
     'ruby', 'go', 'imagemagick', 'graphicsmagick', 'maim', 'xclip',
     // configurables
