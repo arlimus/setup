@@ -276,6 +276,7 @@ exports.configureZshrc = () => {
   ensure('alias yav="youtube-dl -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"')
   ensure('alias y="yay --color auto"')
   ensure('alias findlarge="find . -type f -exec du -h {} + | sort -h"')
+  ensure("alias yaml2json=\"python3 -c 'import sys; import yaml; import json; json.dump(yaml.safe_load(sys.stdin.read(-1)), sys.stdout)'\"")
   ensure('v2a() { ffmpeg -i "$1" -vn -acodec libvorbis -q:a 6 "#1".ogg }')
   ensure('v2mp4() { ffmpeg -i "$1" -c:v libx264 -c:a copy "$1".mp4 }')
   fs.writeFileSync(zshrc, c)
@@ -512,4 +513,7 @@ exports.installDevEnv = () => {
   if(process.env.INSTALL_EXTRAS != 'false') {
     run('gem update')
   }
+
+  // NodeJS
+  run('yarn global add dom-parser')
 }
