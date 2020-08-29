@@ -115,6 +115,9 @@ whitespace = fix
 [pager]
 status = true
 
+[pull]
+ff = only
+
 [merge]
 tool = meld
 
