@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=reco screenrecording and audio
+Comment=Save a recording of a selected area of your screen with audio
+Keywords=screenrecording;capture;
+Exec=recoa
+Terminal=false
+Type=Application
+Icon=org.gnome.Screenshot
+StartupNotify=true
+Categories=KDE;GTK;GNOME;Utility;X-GNOME-Utilities;
+DBusActivatable=true
+Exec=/usr/local/bin/recoa
