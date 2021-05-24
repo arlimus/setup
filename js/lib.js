@@ -173,7 +173,7 @@ exports.installArchBoot = () => {
     'xorg', 'lightdm', 'mesa-libgl', 'lightdm-slick-greeter', 'lightdm-settings',
     'gnome-keyring', 'arc-gtk-theme',
     // i3
-    'i3', 'xfce4-terminal', 'compton', 'rofi', 'rofimoji', 'dunst',
+    'i3', 'xfce4-terminal', 'picom', 'rofi', 'rofimoji', 'dunst',
     'gnome-settings-daemon', 'feh', 'udiskie', 'android-tools',
     // web
     'networkmanager', 'network-manager-applet',
@@ -308,9 +308,9 @@ exports.installCore = () => {
   }
   install('rofi-config', false, configureRofi)
 
-  // compton
-  const configureCompton = () => syncFiles('compton.conf', path.join(os.homedir(), '.config/compton.conf'))
-  install('compton conf', false, configureCompton)
+  // picom
+  const configurePicom = () => syncFiles('picom.conf', path.join(os.homedir(), '.config/picom.conf'))
+  install('picom conf', false, configurePicom)
 
   // terminal
   const configureTerm = () => syncFiles('xfce4terminal.rc', path.join(os.homedir(), '.config/xfce4/terminal/terminalrc'))
