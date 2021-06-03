@@ -228,6 +228,7 @@ exports.installArchCore = () => {
     'base-devel', 'python2', 'nodejs', 'npm', 'yarn', 'python-pip',
     // cli tools
     'zsh', 'the_silver_searcher', 'jq', 'yq', 'ttf-inconsolata',
+    'bat', 'fzf', 'ripgrep',
     // productivity
     'ruby', 'go', 'imagemagick', 'graphicsmagick', 'maim', 'xclip',
     // configurables
