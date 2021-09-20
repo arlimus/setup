@@ -173,7 +173,7 @@ exports.installArchBoot = () => {
     'xorg', 'lightdm', 'mesa-libgl', 'lightdm-slick-greeter', 'lightdm-settings',
     'gnome-keyring', 'arc-gtk-theme',
     // i3
-    'i3', 'xfce4-terminal', 'picom', 'rofi', 'rofimoji', 'dunst',
+    'i3', 'xfce4-terminal', 'picom', 'rofi', 'rofimoji', 'xdotool', 'dunst',
     'gnome-settings-daemon', 'feh', 'udiskie', 'android-tools',
     // web
     'networkmanager', 'network-manager-applet',
