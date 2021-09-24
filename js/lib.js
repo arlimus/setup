@@ -281,6 +281,8 @@ exports.configureZshrc = () => {
   ensure("alias yaml2json=\"python3 -c 'import sys; import yaml; import json; json.dump(yaml.safe_load(sys.stdin.read(-1)), sys.stdout)'\"")
   ensure('v2a() { ffmpeg -i "$1" -vn -acodec libvorbis -q:a 6 "#1".ogg }')
   ensure('v2mp4() { ffmpeg -i "$1" -c:v libx264 -c:a copy "$1".mp4 }')
+  ensure('alias mpvs="mpv --speed=2.5 -af=scaletempo=stride=16:overlap=.68:search=20"')
+  ensure('alias battery="cat /sys/class/power_supply/BAT0/capacity"')
   fs.writeFileSync(zshrc, c)
 }
 
