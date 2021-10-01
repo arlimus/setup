@@ -230,7 +230,7 @@ exports.installArchCore = () => {
     'zsh', 'the_silver_searcher', 'jq', 'yq', 'ttf-inconsolata',
     'bat', 'fzf', 'ripgrep',
     // productivity
-    'ruby', 'go', 'imagemagick', 'graphicsmagick', 'maim', 'xclip',
+    'go', 'imagemagick', 'graphicsmagick', 'maim', 'xclip',
     // configurables
     'code', 'meld', 'colordiff', 'httpie', 'protobuf', 'rsync',
     'inotify-tools', 'youtube-dl', 'x265', 'mpv', 'alsa-utils',
@@ -269,7 +269,6 @@ exports.configureZshrc = () => {
   c = c.replace(/ZSH_THEME=.*/, 'ZSH_THEME="zero-dark"')
   c = c.replace(/^plugins=\((.+[\s\S])+\)/m, 'plugins=(git zero)')
   ensure = x => { if(!c.includes(x)) c += "\n"+x; }
-  ensure('PATH=$HOME/.gem/ruby/2.5.0/bin:$PATH')
   ensure('export GOPATH=/pub/go')
   ensure('export $(gnome-keyring-daemon -s)')
   ensure('PATH=/pub/go/bin:$PATH')
@@ -509,14 +508,6 @@ exports.installDevEnv = () => {
   install('goimports', () => commandExists('goimports'), () => run('go get golang.org/x/tools/cmd/goimports'))
   install('dep', () => commandExists('dep'), () => run('go get -u github.com/golang/dep/cmd/dep'))
   install('protoc', false, () => commandExists('go get -u github.com/golang/protobuf/protoc-gen-go'))
-
-  // Ruby gems
-  install('pry', () => commandExists('pry'), () => run('gem install pry'))
-  install('bundler', () => commandExists('bundle'), () => run('gem install bundler'))
-  install('inspec', () => commandExists('inspec'), () => run('gem install inspec'))
-  if(process.env.INSTALL_EXTRAS != 'false') {
-    run('gem update')
-  }
 
   // NodeJS
   run('yarn global add dom-parser')
