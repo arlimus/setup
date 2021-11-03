@@ -233,7 +233,7 @@ exports.installArchCore = () => {
     'go', 'imagemagick', 'graphicsmagick', 'maim', 'xclip',
     // configurables
     'code', 'meld', 'colordiff', 'httpie', 'protobuf', 'rsync',
-    'inotify-tools', 'youtube-dl', 'x265', 'mpv', 'alsa-utils',
+    'inotify-tools', 'yt-dlp', 'x265', 'mpv', 'alsa-utils',
     'vorbis-tools', 'opus-tools',
   )
 
@@ -273,8 +273,8 @@ exports.configureZshrc = () => {
   ensure('export $(gnome-keyring-daemon -s)')
   ensure('PATH=/pub/go/bin:$PATH')
   ensure('alias b="bundle exec"')
-  ensure('alias ya="youtube-dl -f bestaudio --audio-quality 0 -i -x --extract-audio"')
-  ensure('alias yav="youtube-dl -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"')
+  ensure('alias ya="yt-dlp -f bestaudio --audio-quality 0 -i -x --extract-audio"')
+  ensure('alias yav="yt-dlp -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"')
   ensure('alias y="yay --color auto"')
   ensure('alias findlarge="find . -type f -exec du -h {} + | sort -h"')
   ensure("alias yaml2json=\"python3 -c 'import sys; import yaml; import json; json.dump(yaml.safe_load(sys.stdin.read(-1)), sys.stdout)'\"")
