@@ -1,12 +1,9 @@
+// theme: "Arc-Dark";
+@theme "zero"
+
 configuration {
-  /* fullscreen config */
-  fullscreen: true;
   dpi: 1;
-  width: 50;
-  lines: 50;
-  columns: 1;
   location: 0;
-  padding: 5;
   yoffset: 0;
   xoffset: 0;
   fixed-num-lines: true;
@@ -14,11 +11,19 @@ configuration {
   modi: "combi,window,run,ssh";
   combi-modi: "window,drun,ssh";
 
-  /*theme: "Arc-Dark";*/
-  theme: "zero";
   show-icons: true;
   font: "Inconsolata 16";
 
   tokenize: true;
-  m: -5;  /* -5 == select the monitor that has the mouse pointer */
+
+  // old setting:
+  /* monitor: -5; */ /* -5 == select the monitor that has the mouse pointer */
+}
+
+window {
+  fullscreen: true;
+  width: 100%;
+  lines: 50;
+  columns: 1;
+  padding: 5;
 }
