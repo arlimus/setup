@@ -223,7 +223,7 @@ exports.installArchCore = () => {
   package(
     // basics
     'git', 'vim', 'vim-surround', 'curl', 'htop', 'p7zip', 'encfs',
-    'openssh', 'sshfs', 'tree', 'net-tools',
+    'openssh', 'sshfs', 'tree', 'net-tools', 'termdown',
     // deps for parallels tools
     'base-devel', 'python2', 'nodejs', 'npm', 'yarn', 'python-pip',
     // cli tools
@@ -317,6 +317,9 @@ exports.installCore = () => {
   // terminal
   const configureTerm = () => syncFiles('xfce4terminal.rc', path.join(os.homedir(), '.config/xfce4/terminal/terminalrc'))
   install('xfce4-terminal', false, configureTerm)
+
+  // international input
+  package('fcitx5', 'fcitx5-configtool', 'fcitx5-qt', 'fcitx5-gtk', 'fcitx5-mozc', 'fcitx5-hangul')
 
   // zero tools
   toolsHome = path.join(os.homedir(), '.zero.tools')
