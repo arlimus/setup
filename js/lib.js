@@ -382,31 +382,20 @@ exports.installDevEnv = () => {
     'PeterJausovec.vscode-docker',
     'esbenp.prettier-vscode',
     'passionkind.prettier-vscode-with-tabs',
-    'pnp.polacode',
+    'adpyke.codesnap',
     'bierner.lit-html',
     'bierner.emojisense',
     'wayou.vscode-todo-highlight',
     'wix.vscode-import-cost',
-    'fabiospampinato.vscode-todo-plus'
+    'fabiospampinato.vscode-todo-plus',
+    'github.github-vscode-theme'
   )
 
   ensureJson(path.join(os.homedir(), '.config/Code - OSS/User/settings.json'),
     {
-      "editor.rulers": [80],
-      "editor.tabSize": 2,
-      "editor.insertSpaces": true,
-      "vim.overrideCopy": false,
-      "vim.insertModeKeyBindings": [
-        {
-          "before": ["k", "j"],
-          "after": ["<Esc>"]
-        },
-        {
-          "before": ["j", "k"],
-          "after": ["<Esc>"]
-        }
-      ],
+      "go.formatTool": "goimports",
       "vim.useCtrlKeys": true,
+      "vim.overrideCopy": false,
       "vim.autoindent": true,
       "vim.surround": true,
       "vim.handleKeys": {
@@ -418,7 +407,29 @@ exports.installDevEnv = () => {
         "<C-d>": false,
         "<C-h>": false,
       },
-      "go.formatOnSave": true,
+      "vim.insertModeKeyBindings": [
+        {
+          "before": [
+            "k", "j",
+          ],
+          "after": [
+            "<Esc>"
+          ]
+        },
+        {
+          "before": [
+            "j", "k",
+          ],
+          "after": [
+            "<Esc>"
+          ]
+        }
+      ],
+      "editor.rulers": [
+        80,
+      ],
+      "editor.tabSize": 2,
+      "editor.insertSpaces": true,
       "go.toolsEnvVars": {
         "GO111MODULE": "on",
       },
@@ -429,14 +440,20 @@ exports.installDevEnv = () => {
           "emojiDecoratorsEnabled": false
         },
         "git-commit": true,
+        "go": true,
+        "javascript": true,
         "json": true,
         "yaml": true,
-        "javascript": true,
-        "typescript": true,
-        "ruby": true,
         "html": true,
-        "go": true,
+        "typescript": true,
       },
+      "go.useLanguageServer": true,
+      "go.toolsManagement.autoUpdate": true,
+      "nightswitch.themeDay": "GitHub Light Default",
+      "nightswitch.themeNight": "Default Dark+",
+      "nightswitch.location": "",
+      "nightswitch.autoSwitch": false,
+      "workbench.colorTheme": "Default Dark+",
     }
   )
 
