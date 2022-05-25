@@ -103,6 +103,7 @@ rim= rebase -i master
 rio= rebase -i origin/master
 rsh= reset --soft HEAD
 rhh= reset --hard HEAD
+rho= !git reset --hard origin/"$(git rev-parse --abbrev-ref HEAD)"
 
 s  = status --short
 ss = status
