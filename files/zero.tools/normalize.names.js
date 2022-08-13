@@ -67,10 +67,12 @@ const minifySuffix = (s) => {
 
   let encoding = s.match(/x26[45]/)
   let resolution = s.match(/\b(\d+\d\dp)\b/) // 480p, 720p, 1080p, ...
+  let language = s.match(/\b(ej)\b/)
 
   let res = ''
   if(resolution != null) res += resolution[1] + '.';
   if(encoding != null) res += encoding[0] + '.';
+  if(language != null) res += language[1] + '.';
   return res + suffix[1]
 }
 
@@ -150,17 +152,22 @@ const normName = (x, mode, apply, stats) => {
   r = r.replace(/1280x720/g, '720p')
   r = r.replace(/1920x1080/g, '1080p')
   r = r.replace(/\.opus$/g, '.ogg')
-  r = r.replace(/s(\d\d)[._-]?e(\d\d)/, (_, s, e) => s + '.' + e)
+  r = r.replace(/([-]?)s(\d\d)[._-]?e(\d\d)([-]?)/, (_, pre, s, e, post) => {
+    let a = (pre == null) ? "" : ".-."
+    let z = (post == null) ? "" : ".-."
+    return a + s + '.' + e + z
+  })
   r = r.replace(/s(\d\d?)[.][-][.](\d\d)/, (_, s, e) => pad(s,2) + '.' + e)
   r = r.replace(/season[.]?(\d+)[._-]?episode[.]?(\d+)/, (_, s, e) => pad(s,2) + '.' + pad(e,2))
   r = r.replace(/episode\.(\d+)/, (_, x) => '01.'+pad(x, 2))
   r = r.replace(/(spring|summer|fall|winter).(\d\d\d\d)/, (_, x, y) => y + "." + seasons[x] + "." + x )
   r = r.replace(monthsRegex, (_, x, y) => y + "." + months[x] )
   r = r.replace(/\.(dvdrip|xvid)(-[a-z0-9]+)*/g, '')
+  r = r.replace(/dual[.]?audio/, 'ej')
 
   if(Config.mini) {
-    r = r.replace(/(episode\.\d+\.)(.*)/, (_, x, s) => x + minifySuffix(s))
-    r = r.replace(/(\.\d\d\.\d\d\.)(.*)/, (_, x, s) => x + minifySuffix(s))
+    r = r.replace(/(episode\.\d+\.)(.*)/, (_, x, s) => x + '-.' + minifySuffix(s))
+    r = r.replace(/(\.\d\d\.\d\d\.)(.*)/, (_, x, s) => x + '-.' + minifySuffix(s))
   }
 
   const fMode = mode[x]
