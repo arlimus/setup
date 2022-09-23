@@ -164,6 +164,7 @@ const normName = (x, mode, apply, stats) => {
   r = r.replace(monthsRegex, (_, x, y) => y + "." + months[x] )
   r = r.replace(/\.(dvdrip|xvid)(-[a-z0-9]+)*/g, '')
   r = r.replace(/dual[.]?audio/, 'ej')
+  r = r.replace(/\.-\.(\.?-\.)+/g, '.-.')
 
   if(Config.mini) {
     r = r.replace(/(episode\.\d+\.)(.*)/, (_, x, s) => x + '-.' + minifySuffix(s))
