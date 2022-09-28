@@ -144,3 +144,6 @@ file-view-vpane-position = 530
 #   git format-patch origin/master..HEAD --stdout > update.patch
 # * apply a patch
 #   git am --signoff < update.patch 
+
+[init]
+	defaultBranch = main
