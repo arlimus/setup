@@ -107,6 +107,7 @@ rho= !git reset --hard origin/"$(git rev-parse --abbrev-ref HEAD)"
 
 s  = status --short
 ss = status
+sw = !BRANCH="$1" && git switch origin/"$BRANCH" -C
 
 t  = tag
 
