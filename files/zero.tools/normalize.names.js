@@ -176,8 +176,8 @@ const normName = (x, mode, apply, stats) => {
     const parts = fMode.prefix.split(/[^a-zA-Z0-9]+/)
     parts.forEach(part => r = r.replace(part, ''))
     r = fMode.prefix + r.replace(/^[^A-Za-z0-9]+/, '')
-    r = r.replace(/[.][.]+/, '.')
   }
+  r = r.replace(/[.][.]+/, '.')
 
   if(bn != r) r = r.replace(/^[.-]+/, '')
 
