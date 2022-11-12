@@ -104,19 +104,30 @@ const normName = (x, mode, apply, stats) => {
     return
   }
 
+  // universal things we want
+  r = r.toLowerCase()
   // prevent incorrectly encoded characters from showing up
   r = r.replace(/\x84/g, "ä")
        .replace(/\x81/g, "ü")
        .replace(/\x94/g, "ö")
 
   // we don't want prefixes to screw us up + categorize them:
-  //   _groupname__rest.typ  =!!=>  .groupname.rest.typ
-  // so rename instead
   //   _groupname__rest.typ  ====>  rest.groupname.typ
+  //   [groupname].rest.typ  ====>  rest.groupname.typ
   // must appear before the `_` => `.` change so that the prefix is caught accurately
-  var subex = r.match(/^_(.+?)__/)
-  if(subex != null) {
-    r = r.replace(/(.*)\./, "$1"+subex[1]+".").slice(subex[0].length)
+  let prefix = ""
+  let m = null
+  m = r.match(/^_([^_]+?)__/)
+  if(m != null) {
+    prefix = m[1]
+    r = r.slice(m[0].length)
+  }
+  m = r.match(/^\[([^\]]+?)\]/)
+  // double-checking the prefix is an additional layer of safety. The case where
+  // it could look like two prefixes should never happen, but just in case...
+  if(prefix == "" && m != null) {
+    prefix = m[1]
+    r = r.slice(m[0].length)
   }
 
   // if the name only separates by `_` instead of `.` we replace all those first
@@ -138,7 +149,8 @@ const normName = (x, mode, apply, stats) => {
     r = r.replace(/(.*)\./, "$1."+nu+".").slice(subex[0].length);
   }
 
-  r = r.toLowerCase()
+  // lots of small and big replacements, especially duplicate characters,
+  // problematic characters (utf-8 stuff, quotes), and optimizations (resolution)
   r = r.replace(/\s+/g, sep)
   r = r.replace(/[\[\({]+/g, sep + '-' + sep)
   r = r.replace(/[\]\)!]+/g, sep)
@@ -151,6 +163,7 @@ const normName = (x, mode, apply, stats) => {
   r = r.replace(/\b\.+$/, '')
   r = r.replace(/1280x720/g, '720p')
   r = r.replace(/1920x1080/g, '1080p')
+  r = r.replace(/1080pp/g, '1080p')
   r = r.replace(/\.opus$/g, '.ogg')
   r = r.replace(/([-]?)s(\d\d)[._-]?e(\d\d)([-]?)/, (_, pre, s, e, post) => {
     let a = (pre == null) ? "" : ".-."
@@ -164,11 +177,21 @@ const normName = (x, mode, apply, stats) => {
   r = r.replace(monthsRegex, (_, x, y) => y + "." + months[x] )
   r = r.replace(/\.(dvdrip|xvid)(-[a-z0-9]+)*/g, '')
   r = r.replace(/dual[.]?audio/, 'ej')
-  r = r.replace(/\.-\.(\.?-\.)+/g, '.-.')
 
+  // a few more post-cleanup duplicates, that may have been created in
+  // the process above
+  r = r.replace(/\.-\.(\.?-\.)+/g, '.-.')
+  r = r.replace(/[.][.]+/g, '.')
+
+  // done very late so we benefit from all cleanups
   if(Config.mini) {
     r = r.replace(/(episode\.\d+\.)(.*)/, (_, x, s) => x + '-.' + minifySuffix(s))
     r = r.replace(/(\.\d\d\.\d\d\.)(.*)/, (_, x, s) => x + '-.' + minifySuffix(s))
+  }
+
+  // get back that lovely prefix we started with, but add it to the end
+  if(prefix != "") {
+    r = r.replace(/(\.[^.]+?)$/, (_, x) => "." + prefix + x)
   }
 
   const fMode = mode[x]
@@ -177,7 +200,7 @@ const normName = (x, mode, apply, stats) => {
     parts.forEach(part => r = r.replace(part, ''))
     r = fMode.prefix + r.replace(/^[^A-Za-z0-9]+/, '')
   }
-  r = r.replace(/[.][.]+/g, '.')
+
 
   if(bn != r) r = r.replace(/^[.-]+/, '')
 
