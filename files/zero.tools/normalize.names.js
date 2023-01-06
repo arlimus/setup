@@ -138,29 +138,29 @@ const normName = (x, mode, apply, stats) => {
     r = r.replace(/[_]+/g, '.')
   }
 
-  // we want the bracketed `[..]` prefix to be used as a grouping suffix
-  //   [groupname].rest.typ  ====>  rest.groupname.typ
-  // these groupnames distract from the actual filename so should be added towards the end
-  // must appear after the `_` => `.` change to prevent it from not working
-  var subex = r.match(/^\[(.+?)\]/)
-  if(subex != null) {
-    let old = subex[1];
-    let nu = old.replace(/\.[a-z]{3}$/, '');
-    r = r.replace(/(.*)\./, "$1."+nu+".").slice(subex[0].length);
-  }
-
   // lots of small and big replacements, especially duplicate characters,
   // problematic characters (utf-8 stuff, quotes), and optimizations (resolution)
-  r = r.replace(/\s+/g, sep)
-  r = r.replace(/[\[\({]+/g, sep + '-' + sep)
-  r = r.replace(/[\]\)!]+/g, sep)
-  r = r.replace(/[&$]/g, '+')
-  r = r.replace(/['"’]+/g, '')
-  r = r.replace(/[—–_]+/g, '-')
-  r = r.replace(/-[-]+/g, '-')
-  r = r.replace(/-[-]+/g, '-')
-  r = r.replace(/\.\.+/g, sep)
-  r = r.replace(/\b\.+$/, '')
+  const cleanChars = (r) => {
+    r = r.replace(/\s+/g, sep)
+    r = r.replace(/[\[\({]+/g, sep + '-' + sep)
+    r = r.replace(/[\]\)!]+/g, sep)
+    r = r.replace(/[&$]/g, '+')
+    r = r.replace(/['"’]+/g, '')
+    r = r.replace(/[—–_]+/g, '-')
+    r = r.replace(/-[-]+/g, '-')
+    r = r.replace(/-[-]+/g, '-')
+    r = r.replace(/\.\.+/g, sep)
+    r = r.replace(/\b\.+$/, '')
+    return r
+  }
+
+  if(Config.mini) {
+    // remove code indicators like [abcd1234]
+    r = r.replace(/\[[a-z0-9]{8}\]/g, '')
+  }
+
+  r = cleanChars(r)
+
   r = r.replace(/1280x720/g, '720p')
   r = r.replace(/1920x1080/g, '1080p')
   r = r.replace(/1080pp/g, '1080p')
@@ -183,14 +183,16 @@ const normName = (x, mode, apply, stats) => {
   r = r.replace(/\.-\.(\.?-\.)+/g, '.-.')
   r = r.replace(/[.][.]+/g, '.')
 
-  // done very late so we benefit from all cleanups
-  if(Config.mini) {
-    r = r.replace(/(episode\.\d+\.)(.*)/, (_, x, s) => x + '-.' + minifySuffix(s))
-    r = r.replace(/(\.\d\d\.\d\d\.)(.*)/, (_, x, s) => x + '-.' + minifySuffix(s))
-  }
+  // // TODO: this is really removing way too much right now, we need a better algo
+  // // done very late so we benefit from all cleanups
+  // if(Config.mini) {
+  //   r = r.replace(/(episode\.\d+\.)(.*)/, (_, x, s) => x + '-.' + minifySuffix(s))
+  //   r = r.replace(/(\.\d\d\.\d\d\.)(.*)/, (_, x, s) => x + '-.' + minifySuffix(s))
+  // }
 
   // get back that lovely prefix we started with, but add it to the end
   if(prefix != "") {
+    prefix = cleanChars(prefix)
     r = r.replace(/(\.[^.]+?)$/, (_, x) => "." + prefix + x)
   }
 
