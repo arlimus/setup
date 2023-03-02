@@ -250,6 +250,7 @@ exports.installArchCore = () => {
   install('recoa', () => fs.existsSync('/usr/local/bin/recoa'), () => syncFiles('recoa.sh', '/usr/local/bin/recoa'))
   install('ylater', () => fs.existsSync('/usr/local/bin/ylater'), () => syncFiles('ylater.sh', '/usr/local/bin/ylater'))
   install('ylaterw', () => fs.existsSync('/usr/local/bin/ylaterw'), () => syncFiles('ylaterw.sh', '/usr/local/bin/ylaterw'))
+  install('ylaterhq', () => fs.existsSync('/usr/local/bin/ylaterhq'), () => syncFiles('ylaterhq.sh', '/usr/local/bin/ylaterhq'))
 }
 
 exports.configureZshrc = () => {
