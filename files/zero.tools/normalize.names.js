@@ -173,6 +173,7 @@ const normName = (x, mode, apply, stats) => {
   r = r.replace(/s(\d\d?)[.][-][.](\d\d)/, (_, s, e) => pad(s,2) + '.' + e)
   r = r.replace(/season[.]?(\d+)[._-]?episode[.]?(\d+)/, (_, s, e) => pad(s,2) + '.' + pad(e,2))
   r = r.replace(/episode\.(\d+)/, (_, x) => '01.'+pad(x, 2))
+  r = r.replace(/(\D)(\d)x(\d{1,2})(\D)/, (_, p1, s, e, p2) => p1 + pad(s,2) + '.' + pad(e,2) + p2)
   r = r.replace(/(spring|summer|fall|winter).(\d\d\d\d)/, (_, x, y) => y + "." + seasons[x] + "." + x )
   r = r.replace(monthsRegex, (_, x, y) => y + "." + months[x] )
   r = r.replace(/\.(dvdrip|xvid)(-[a-z0-9]+)*/g, '')
