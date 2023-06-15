@@ -165,6 +165,7 @@ const normName = (x, mode, apply, stats) => {
   r = r.replace(/1920x1080/g, '1080p')
   r = r.replace(/1080pp/g, '1080p')
   r = r.replace(/\.opus$/g, '.ogg')
+  r = r.replace(/-(\d\d)-/, (_, e) => '.' + e + '.')
   r = r.replace(/([-]?)s(\d\d)[._-]?e(\d\d)([-]?)/, (_, pre, s, e, post) => {
     let a = (pre == null) ? "" : ".-."
     let z = (post == null) ? "" : ".-."
