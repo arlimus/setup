@@ -101,6 +101,7 @@ r  = reset
 ri = rebase -i
 rim= rebase -i master
 rio= rebase -i origin/master
+rss= reset --soft HEAD^
 rsh= reset --soft HEAD
 rhh= reset --hard HEAD
 rho= !git reset --hard origin/"$(git rev-parse --abbrev-ref HEAD)"
@@ -108,6 +109,8 @@ rho= !git reset --hard origin/"$(git rev-parse --abbrev-ref HEAD)"
 s  = status --short
 ss = status
 sw = !BRANCH="$1" && git switch origin/"$BRANCH" -C
+
+sac = !git stash apply && git stash clear
 
 t  = tag
 
