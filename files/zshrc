@@ -117,6 +117,9 @@ v2a() { ffmpeg -i "$1" -vn -acodec libvorbis -q:a 6 "#1".ogg }
 v2mp4() { ffmpeg -i "$1" -c:v libx264 -c:a copy "$1".mp4 }
 alias mpvs="mpv --af=scaletempo=speed=tempo:stride=30 --speed=2.25"
 
+alias cp="acp -gni "
+alias mv="amv -gni "
+
 alias evy="cd /pub/go/src/github.com/arlimus/evy && sudo go run main.go"
 alias exile-diary="cd /pub/git/exile-diary && yarn start ."
 

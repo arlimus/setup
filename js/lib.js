@@ -234,7 +234,7 @@ exports.installArchCore = () => {
     // configurables
     'code', 'meld', 'colordiff', 'httpie', 'protobuf', 'rsync',
     'inotify-tools', 'yt-dlp', 'x265', 'mpv', 'alsa-utils',
-    'vorbis-tools', 'opus-tools',
+    'vorbis-tools', 'opus-tools', 'advcpmv'
   )
 
   ensureLines("/etc/locale.conf", "LANG=en_US.utf8")
