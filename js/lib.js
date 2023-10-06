@@ -222,7 +222,7 @@ exports.installArchCore = () => {
 
   package(
     // basics
-    'git', 'vim', 'vim-surround', 'curl', 'htop', 'p7zip', 'encfs',
+    'git', 'diff-so-fancy', 'vim', 'vim-surround', 'curl', 'htop', 'p7zip', 'encfs',
     'openssh', 'sshfs', 'tree', 'net-tools', 'termdown',
     // deps for parallels tools
     'base-devel', 'python2', 'nodejs', 'npm', 'yarn', 'python-pip',

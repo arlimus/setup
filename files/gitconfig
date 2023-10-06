@@ -9,7 +9,7 @@ email = your.name@email.com
 
 [core]
 # excludesfile = /home/xxx/.gitignore-global
-pager = less -FRX
+pager = diff-so-fancy | less --tabs=4 -RFX
 editor = vim
 
 # # in case your firewall is blocking git://, use https:// instead
@@ -119,6 +119,7 @@ whitespace = fix
 
 [pager]
 status = true
+show = diff-so-fancy | less --tabs=1,5 -RFX
 
 [pull]
 ff = only
@@ -150,3 +151,6 @@ file-view-vpane-position = 530
 
 [init]
 	defaultBranch = main
+
+[interactive]
+	diffFilter = diff-so-fancy --patch
