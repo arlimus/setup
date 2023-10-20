@@ -93,9 +93,9 @@ const months = {
 }
 const monthsRegex = RegExp('('+Object.keys(months).join('|')+').(\\d\\d\\d\\d)')
 
-const normName = (x, mode, apply, stats) => {
-  var dir = path.dirname(x)
-  var bn = path.basename(x)
+const normName = (x, hooks, apply, stats) => {
+  var dir = path.dirname(x.path)
+  var bn = path.basename(x.path)
   var r = bn
 
   // for all partial files we don't want to rename them, as they are still in progress
@@ -198,15 +198,12 @@ const normName = (x, mode, apply, stats) => {
     r = r.replace(/(\.[^.]+?)$/, (_, x) => "." + prefix + x)
   }
 
-  const fMode = mode[x]
-  if (fMode != null) {
-    const parts = fMode.prefix.split(/[^a-zA-Z0-9]+/)
-    parts.forEach(part => r = r.replace(part, ''))
-    r = fMode.prefix + r.replace(/^[^A-Za-z0-9]+/, '')
-  }
-
-
   if(bn != r) r = r.replace(/^[.-]+/, '')
+
+  const hook = hooks[x.path]
+  if (hook != null) {
+    r = hook(r)
+  }
 
   Config.replace.forEach(m => {
     r = r.replace(m.old, m.nu)
@@ -223,52 +220,114 @@ const normName = (x, mode, apply, stats) => {
   return r
 }
 
-const updateFileModes = (folder, files, mode) => {
+const normalizeFolderFiles = (folder, all, hooks) => {
+  let files = all.filter(x => x.stat.isFile())
+
   const extensions = {}
-  files.forEach(f => extensions[path.extname(f).slice(1)] = true)
+  files.forEach(f => extensions[path.extname(f.path).slice(1)] = true)
 
-  if (!extensions.pdf) {
-    return
-  }
-
-  delete(extensions.pdf)
-  delete(extensions.rar)
-  delete(extensions.zip)
-
-  if (Object.keys(extensions).length !== 0) {
-    console.log("mixed files in folder, not a pdf collection")
+  if(Object.keys(extensions).length === 0) {
     return
   }
 
   const folderName = path.basename(path.resolve(folder))
-  const prefix = normName(folderName, {}, false, null) + '.-.'
 
-  files.forEach((file) => {
-    const ext = path.extname(file)
-    if (ext !== '.pdf') return;
-    mode[file] = { prefix }
-  })
+  if (extensions.jpg || extensions.jpeg || extensions.png) {
+    delete(extensions.jpeg)
+    delete(extensions.jpg)
+    delete(extensions.png)
+
+    if (Object.keys(extensions).length !== 0) {
+      console.log("mixed files in folder, not a jpg collection")
+      return
+    }
+
+    const maxDigits = 3
+    let outliers = []
+    files.map(x => path.basename(x.path)).forEach(x => {
+      if(normalizeSequence(x, folderName, maxDigits) == null) {
+        outliers.push(x)
+      }
+    })
+
+    if(outliers.length !== 0) {
+      debugger
+      return
+    }
+
+    files.forEach(f => {
+      hooks[f.path] = (name) => {
+        let nu = normalizeSequence(name, folderName, maxDigits)
+        if(nu == null) return name
+        return nu
+      }
+    })
+  }
+}
+
+const normalizeSequence = (name, prefix, numLen) => {
+  let base = name
+  if(name.startsWith(prefix)) {
+    base = name.slice(prefix.length+1)
+  }
+
+  if(base.match(/cover/)) return prefix + "." + ("0").padStart(numLen,"0") + "." + base.replace(/.*cover/, "cover");
+
+  let m = base.match(/\d+/)
+  if(m == null) { return null }
+
+  let num = parseInt(m, 10)
+  if(isNaN(num)) { return null }
+
+  let nums = (num+"").padStart(numLen,"0")
+
+  let suffix = base.match(/\.[^.]+$/)
+  if(suffix == null) { return null }
+
+  let res = prefix + "." + nums + suffix[0]
+  return res
 }
 
 const flatten = x => [].concat.apply([], x.filter(i=>i))
 
-const expandFile = (file, mode) => {
-  stat = fs.statSync(file);
-  if(stat.isFile()) return file;
+const expandFile = (path, hooks) => {
+  stat = fs.statSync(path);
+  let file = {
+    path: path,
+    stat,
+  }
+  let res = [file]
+
+  if(stat.isFile()) return res;
+
   if(!stat.isDirectory()) {
-    console.log(colors.red(`Cannot process ${file}, it is not a file nor a directory`))
+    console.log(colors.red(`Cannot process ${path}, it is not a file nor a directory`))
     return null;
   }
 
-  let nuFiles = glob(file + '/*')
-  updateFileModes(file, nuFiles, mode)
+  let nu = expandDir(path, hooks)
+  res.push(...nu)
 
-  nu = expandFiles(nuFiles, mode)
-  nu.push(file)
-  return nu
+  return res
 }
 
-const expandFiles = (files, mode) => flatten(files.map(x => expandFile(x, mode)))
+const expandDir = (path, hooks) => {
+  let all = glob(path + '/*').
+    map(path => ({
+      path: path,
+      stat: fs.statSync(path),
+    }))
+
+  normalizeFolderFiles(path, all, hooks)
+
+  all.filter(x => x.stat.isDirectory()).forEach(x => {
+    let nu = expandDir(x.path, hooks)
+    all.push(...nu)
+  })
+  return all
+}
+
+const expandFiles = (files, hooks) => flatten(files.map(x => expandFile(x, hooks)))
 
 const printStats = stats => {
   if(stats == null) return;
@@ -278,12 +337,12 @@ const printStats = stats => {
 
 console.log(colors.green(`Input: ${_s(files.length, 'file')}`))
 
-var mode = {}
-xfiles = expandFiles(files, mode)
+var hooks = {}
+xfiles = expandFiles(files, hooks)
 console.log(colors.green(`Expanded files: ${_s(xfiles.length, 'xfiles')}`))
 
 var stats = { rename: [], unchanged: [] }
-xfiles.forEach(x => normName(x, mode, false, stats))
+xfiles.forEach(x => normName(x, hooks, false, stats))
 
 printStats(stats)
 if(stats.rename.length === 0) {
@@ -298,7 +357,7 @@ inquirer.prompt({ type: 'confirm', name: 'rename',
     console.log("Aborting.")
     process.exit(0)
   }
-  xfiles.forEach(x => normName(x, mode, true))
+  xfiles.forEach(x => normName(x, hooks, true))
   console.log(colors.green("All done."))
   process.exit(0)
 })
