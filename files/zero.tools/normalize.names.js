@@ -8,6 +8,7 @@ const glob = require('glob').sync;
 const Config = {
   mini: false,
   replace: [],
+  exceptions: {"_ocr": true},
 };
 
 const args = process.argv.slice(2);
@@ -97,6 +98,9 @@ const normName = (x, hooks, apply, stats) => {
   var dir = path.dirname(x.path)
   var bn = path.basename(x.path)
   var r = bn
+
+  // exceptions
+  if(Config.exceptions[r]) return;
 
   // for all partial files we don't want to rename them, as they are still in progress
   if(r.endsWith('.part')) {
@@ -273,7 +277,13 @@ const normalizeSequence = (name, prefix, numLen) => {
 
   debugger
 
+  // special handling for base:
+  // - cover.anything.jpg ==> prefix.000.cover.anything.jpg
   if(base.match(/cover/)) return prefix + "." + ("0").padStart(numLen,"0") + "." + base.replace(/.*cover/, "cover");
+  // - 000.12.jpg ==> prefix.000.12.jpg
+  if(base.match(/000\.\d+/)) return prefix + "." + base;
+  // - 000a.jpg ==> prefix.000.a.jpg
+  if(base.match(/000[a-z]/)) return prefix + "." + base.replace(/(0+)(a-z)/, "\\1.\\2");
 
   let m = base.match(/\d+/g)
   if(m == null) { return null }
