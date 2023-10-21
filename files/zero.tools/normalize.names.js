@@ -271,12 +271,15 @@ const normalizeSequence = (name, prefix, numLen) => {
     base = name.slice(prefix.length+1)
   }
 
+  debugger
+
   if(base.match(/cover/)) return prefix + "." + ("0").padStart(numLen,"0") + "." + base.replace(/.*cover/, "cover");
 
-  let m = base.match(/\d+/)
+  let m = base.match(/\d+/g)
   if(m == null) { return null }
 
-  let num = parseInt(m, 10)
+  let last = m[m.length-1]
+  let num = parseInt(last, 10)
   if(isNaN(num)) { return null }
 
   let nums = (num+"").padStart(numLen,"0")
