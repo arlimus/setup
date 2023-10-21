@@ -261,6 +261,9 @@ const normalizeFolderFiles = (folder, all, hooks) => {
 
     files.forEach(f => {
       hooks[f.path] = (name) => {
+        if(f.stat.isFile() && (f.stat.mode & 0o777) != (f.stat.mode & 0o644)) {
+          fs.chmodSync(f.path, 0o644)
+        }
         let nu = normalizeSequence(name, folderName, maxDigits)
         if(nu == null) return name
         return nu
@@ -275,15 +278,13 @@ const normalizeSequence = (name, prefix, numLen) => {
     base = name.slice(prefix.length+1)
   }
 
-  debugger
-
   // special handling for base:
   // - cover.anything.jpg ==> prefix.000.cover.anything.jpg
   if(base.match(/cover/)) return prefix + "." + ("0").padStart(numLen,"0") + "." + base.replace(/.*cover/, "cover");
   // - 000.12.jpg ==> prefix.000.12.jpg
   if(base.match(/000\.\d+/)) return prefix + "." + base;
   // - 000a.jpg ==> prefix.000.a.jpg
-  if(base.match(/000[a-z]/)) return prefix + "." + base.replace(/(0+)(a-z)/, "\\1.\\2");
+  if(base.match(/000\.?[a-z]/)) return prefix + "." + base.replace(/(0+)\.?(a-z)/, "\\1.\\2");
 
   let m = base.match(/\d+/g)
   if(m == null) { return null }
