@@ -329,7 +329,8 @@ exports.installCore = () => {
     'cd '+toolsHome,
     'yarn',
     // and install
-    'sudo ln -s $(pwd)/normalize.names.js /usr/local/bin/normalize.names'
+    'sudo ln -s $(pwd)/normalize.names.js /usr/local/bin/normalize.names',
+    'sudo ln -s $(pwd)/mextract.py /usr/local/bin/mextract',
   ].join(' && '))
 }
 
