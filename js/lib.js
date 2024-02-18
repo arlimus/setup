@@ -202,11 +202,6 @@ exports.installArchBoot = () => {
 
   run('sudo ln -sf /usr/lib/systemd/scripts/ /etc/init.d')
   run('sudo touch /etc/X11/xorg.conf')
-  run('sudo ln -sf /usr/bin/python2 /usr/local/bin/python')
-  installParallelsTools = () => {
-    console.error("Please install parallels tools manually!")
-  }
-  install('parallels-tools', () => fs.existsSync('/usr/lib/parallels-tools/version'), () => installParallelsTools())
 
   syncFiles('inco.desktop', '/usr/share/applications/inco.desktop')
 }
