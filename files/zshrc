@@ -100,6 +100,7 @@ source $ZSH/oh-my-zsh.sh
 
 export PATH=$HOME/.yarn/bin:$HOME/.local/bin:$PATH
 export $(gnome-keyring-daemon -s)
+export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
 
 export GOPATH=/pub/go
 export PATH=/pub/go/bin:$PATH
@@ -110,6 +111,7 @@ export PATH="$PATH:$GEM_HOME/bin"
 alias ya="yt-dlp -f bestaudio --audio-quality 0 -i -x --extract-audio"
 alias yav="yt-dlp -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"
 alias yav1080="yt-dlp -f 248"
+alias ytdl="yt-dlp -f 'bv*[height<=720]+ba*[abr<=128]'"
 alias y="yay --color auto"
 alias findlarge="find . -type f -exec du -h {} + | sort -h"
 alias yaml2json="python3 -c 'import sys; import yaml; import json; json.dump(yaml.safe_load(sys.stdin.read(-1)), sys.stdout)'"
@@ -119,10 +121,11 @@ alias mpvs="mpv --af=scaletempo=speed=tempo:stride=30 --speed=2.25"
 
 alias cp="acp -gni "
 alias mv="amv -gni "
+alias cpforce="acp -f "
 
 alias evy="cd /pub/go/src/github.com/arlimus/evy && sudo go run main.go"
-alias exile-diary="cd /pub/git/exile-diary && yarn start ."
 
 alias btoff="rfkill block bluetooth"
+# add: ... && bluetoothctl connect AA:BB:CC:DD:EE:FF  <= your device
 alias bton="rfkill unblock bluetooth && sleep 1"
 
