@@ -230,7 +230,7 @@ exports.installArchCore = () => {
     'code', 'meld', 'colordiff', 'httpie', 'protobuf', 'rsync',
     'inotify-tools', 'yt-dlp', 'x265', 'mpv', 'alsa-utils',
     'vorbis-tools', 'opus-tools', 'advcpmv',
-    'noto-fonts', 'noto-fonts-emoji', 'noto-fonts-extra'
+    'noto-fonts', 'noto-fonts-emoji', 'noto-fonts-extra', 'noto-fonts-cjk'
   )
 
   ensureLines("/etc/locale.conf", "LANG=en_US.utf8")
