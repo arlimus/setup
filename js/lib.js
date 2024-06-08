@@ -330,6 +330,11 @@ exports.installCore = () => {
 }
 
 exports.installDevEnv = () => {
+  // ssh config
+  const sshconfPath = path.join(os.homedir(), '.ssh/config')
+  syncFile('user_ssh_config', sshconfPath)
+  run('systemctl --user enable --now ssh-agent')
+
   // Gitconfig
   const gitconfPath = path.join(os.homedir(), '.gitconfig')
   const gitconfSet = x => {
