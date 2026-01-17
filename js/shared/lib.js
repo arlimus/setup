@@ -176,7 +176,9 @@ exports.installArchBoot = () => {
     'i3', 'xfce4-terminal', 'picom', 'rofi', 'rofimoji', 'xdotool', 'dunst',
     'gnome-settings-daemon', 'feh', 'udiskie', 'android-tools',
     // web
-    'networkmanager', 'network-manager-applet',
+    //'networkmanager', 'network-manager-applet',
+    'iwd', 'dhcpcd',
+    'bluez', 'bluetui',
     'firefox', 'chromium',
     // productivity
     //'gimp', 'telegram-desktop-bin', 'slack-desktop',
@@ -226,13 +228,15 @@ exports.installArchCore = () => {
     'bat', 'fzf', 'ripgrep',
     // productivity
     'go', 'imagemagick', 'graphicsmagick', 'maim', 'xclip',
-    // configurables
     'code', 'meld', 'colordiff', 'httpie', 'protobuf', 'rsync',
+    // video-tools
     'inotify-tools', 'yt-dlp', 'x265', 'mpv', 'alsa-utils',
-    'vorbis-tools', 'opus-tools', 'advcpmv',
+    'mkvtoolnix-cli', 'ffmpeg',
+    'vorbis-tools', 'opus-tools', 'advcpmv', 'obs-studio',
+    // fonts
     'noto-fonts', 'noto-fonts-emoji', 'noto-fonts-extra', 'noto-fonts-cjk',
     // comms
-    'discord', 'slack-desktop', 'telegram-desktop'
+    'discord', 'slack-desktop', 'telegram-desktop',
   )
 
   ensureLines("/etc/locale.conf", "LANG=en_US.utf8")
@@ -319,6 +323,8 @@ exports.installCore = () => {
 
   // international input
   package('fcitx5', 'fcitx5-configtool', 'fcitx5-qt', 'fcitx5-gtk', 'fcitx5-mozc', 'fcitx5-hangul')
+  // TODO: users must enable it via:
+  // systemctl --user enable app-org.fcitx.Fcitx5@autostart.service
 
   // zero tools
   toolsHome = path.join(os.homedir(), '.zero.tools')
