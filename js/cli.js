@@ -1,4 +1,4 @@
-const setup = require('./lib.js');
+const setup = require('./shared/lib.js');
 
 if(setup.isOsx) { 
   setup.installOsxBase()
@@ -11,3 +11,4 @@ if(setup.isArch) {
 setup.configureZshrc()
 setup.installCore()
 setup.installDevEnv()
+// setup.installAmdGraphics()

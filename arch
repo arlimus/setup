@@ -31,7 +31,7 @@ fi
 
 install_node() {
   echo "====> Install node"
-  yay -S --noconfirm nodejs npm yarn
+  yay -S --noconfirm pnpm
 }
 if command -v node > /dev/null && \
    command -v npm > /dev/null && \

@@ -217,10 +217,10 @@ exports.installArchCore = () => {
 
   package(
     // basics
-    'git', 'diff-so-fancy', 'vim', 'vim-surround', 'curl', 'htop', 'p7zip', 'encfs',
+    'git', 'diff-so-fancy', 'vim', 'neovim', 'vim-surround', 'curl', 'htop', 'p7zip', 'encfs',
     'openssh', 'sshfs', 'tree', 'net-tools', 'termdown',
     // deps for parallels tools
-    'base-devel', 'nodejs', 'npm', 'pnpm', 'python-pip',
+    'base-devel', 'pnpm', 'python-pip',
     // cli tools
     'zsh', 'the_silver_searcher', 'jq', 'yq', 'ttf-inconsolata',
     'bat', 'fzf', 'ripgrep',
@@ -230,7 +230,9 @@ exports.installArchCore = () => {
     'code', 'meld', 'colordiff', 'httpie', 'protobuf', 'rsync',
     'inotify-tools', 'yt-dlp', 'x265', 'mpv', 'alsa-utils',
     'vorbis-tools', 'opus-tools', 'advcpmv',
-    'noto-fonts', 'noto-fonts-emoji', 'noto-fonts-extra', 'noto-fonts-cjk'
+    'noto-fonts', 'noto-fonts-emoji', 'noto-fonts-extra', 'noto-fonts-cjk',
+    // comms
+    'discord', 'slack-desktop', 'telegram-desktop'
   )
 
   ensureLines("/etc/locale.conf", "LANG=en_US.utf8")
@@ -255,7 +257,7 @@ exports.configureZshrc = () => {
   const defaultZsh = () => run('chsh -s /bin/zsh')
   //install('zsh-default', () => process.env.SHELL == '/bin/zsh', defaultZsh)
   const installOhMyZsh = () => {
-    gitEnsure('git://github.com/robbyrussell/oh-my-zsh.git', path.join(os.homedir(), '.oh-my-zsh'))
+    gitEnsure('https://github.com/robbyrussell/oh-my-zsh.git', path.join(os.homedir(), '.oh-my-zsh'))
     if(!fs.existsSync(zshrc))
       shell.cp("~/.oh-my-zsh/templates/zshrc.zsh-template", zshrc)
     return run('curl https://raw.githubusercontent.com/arlimus/zero.zsh/master/bootstrap.sh | sh -')
@@ -297,7 +299,7 @@ exports.installCore = () => {
   run('gsettings set org.gnome.gnome-screenshot auto-save-directory "file:///home/$USER/Screenshots/"')
 
   // i3
-  const configureI3 = () => syncFiles('i3.config', path.join(os.homedir(), '.i3/config'))
+  const configureI3 = () => syncFiles('i3.config', path.join(os.homedir(), '.config/i3/config'))
   install('i3-config', false, configureI3)
 
   // rofi
@@ -323,7 +325,7 @@ exports.installCore = () => {
   syncFiles('zero.tools', toolsHome)
   run([
     'cd '+toolsHome,
-    'yarn',
+    'pnpm i',
     // and install
     'sudo ln -s $(pwd)/normalize.names.js /usr/local/bin/normalize.names',
     'sudo ln -s $(pwd)/mextract.py /usr/local/bin/mextract',
@@ -344,9 +346,10 @@ exports.installDevEnv = () => {
   }
   const gitconfSettings = () => {
     print.info('configure global git settings')
+    print.info('please answer the following questions:')
     q = [
-      { type: 'input', name: 'name', message: 'What is your name' },
-      { type: 'input', name: 'email', message: 'What is your email' },
+      { type: 'input', name: 'name', message: 'What is your name?' },
+      { type: 'input', name: 'email', message: 'What is your email?' },
     ]
     return inquirer.prompt(q).then(gitconfSet)
   }
@@ -383,10 +386,10 @@ exports.installDevEnv = () => {
     'HookyQR.beautify',
     'BriteSnow.vscode-toggle-quotes',
     'PeterJausovec.vscode-docker',
-    'esbenp.prettier-vscode',
+    // 'esbenp.prettier-vscode',
     'passionkind.prettier-vscode-with-tabs',
     'adpyke.codesnap',
-    'bierner.lit-html',
+    // 'bierner.lit-html',
     'bierner.emojisense',
     'wayou.vscode-todo-highlight',
     'wix.vscode-import-cost',
@@ -528,10 +531,19 @@ exports.installDevEnv = () => {
   )
 
   // Go
-  install('goimports', () => commandExists('goimports'), () => run('go get golang.org/x/tools/cmd/goimports'))
-  install('dep', () => commandExists('dep'), () => run('go get -u github.com/golang/dep/cmd/dep'))
   install('protoc', false, () => commandExists('go get -u github.com/golang/protobuf/protoc-gen-go'))
+}
 
-  // NodeJS
-  run('yarn global add dom-parser')
+exports.installAmdGraphics = () => {
+  configureMultilib = () => {
+    p = '/etc/pacman.conf'
+    c = fs.readFileSync(p, 'utf-8')
+    c = c.replace(/^#?\[multilib\].*\n#?.*/m, '[multilib]\nInclude = /etc/pacman.d/mirrorlist')
+    fs.writeFileSync('/etc/pacman.conf', c)
+  }
+  install('configure multilib', false, configureMultilib)
+
+  package(
+    'lib32-mesa', 'xf86-video-amdgpu', 'vulkan-radeon',
+  )
 }

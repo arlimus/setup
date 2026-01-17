@@ -1,4 +1,4 @@
-const setup = require('./lib.js');
+const setup = require('./shared/lib.js');
 
 if(setup.isArch) {
   setup.installArchBoot()
