@@ -379,17 +379,15 @@ exports.installDevEnv = () => {
     x.forEach(y => install(`vscode: ${y}`, () => vscodeExist.includes(y), () => run(`code --install-extension ${y}`)))
 
   vscodeExtensions(
-    'vscodevim.vim',
+    // 'vscodevim.vim',
+    'asvetliakov.vscode-neovim',
     'ms-vscode.go',
     'zxh404.vscode-proto3',
     'dbaeumer.vscode-eslint',
     'HookyQR.beautify',
-    'BriteSnow.vscode-toggle-quotes',
     'PeterJausovec.vscode-docker',
-    // 'esbenp.prettier-vscode',
-    'passionkind.prettier-vscode-with-tabs',
+    'prettier.prettier-vscode',
     'adpyke.codesnap',
-    // 'bierner.lit-html',
     'bierner.emojisense',
     'wayou.vscode-todo-highlight',
     'wix.vscode-import-cost',
