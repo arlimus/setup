@@ -174,7 +174,7 @@ exports.installArchBoot = () => {
     'gnome-keyring', 'arc-gtk-theme',
     // i3
     'i3', 'xfce4-terminal', 'picom', 'rofi', 'rofimoji', 'xdotool', 'dunst',
-    'gnome-settings-daemon', 'feh', 'udiskie', 'android-tools',
+    'gnome-settings-daemon', 'feh', 'udiskie', 'android-tools', 'dmidecode',
     // web
     //'networkmanager', 'network-manager-applet',
     'iwd', 'dhcpcd',
@@ -229,6 +229,8 @@ exports.installArchCore = () => {
     // productivity
     'go', 'imagemagick', 'graphicsmagick', 'maim', 'xclip',
     'code', 'meld', 'colordiff', 'httpie', 'protobuf', 'rsync',
+    // audio config
+    'pipewire', 'pavucontrol',
     // video-tools
     'inotify-tools', 'yt-dlp', 'x265', 'mpv', 'alsa-utils',
     'mkvtoolnix-cli', 'ffmpeg',
