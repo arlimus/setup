@@ -273,6 +273,11 @@ export const configureZshrc = () => {
   c = c.replace(/^plugins=\((.+[\s\S])+\)/m, 'plugins=(git zero)')
   ensure = x => { if(!c.includes(x)) c += "\n"+x; }
 
+  ensure('export GTK_IM_MODULE=fcitx')
+  ensure('export QT_IM_MODULE=fcitx')
+  ensure('export XMODIFIERS=@im=fcitx')
+  ensure('export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"')
+
   ensure('export GOPATH=/pub/go')
   ensure('export $(gnome-keyring-daemon -s)')
   ensure('PATH=/pub/go/bin:$PATH')
