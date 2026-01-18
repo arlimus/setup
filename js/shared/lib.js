@@ -1,18 +1,18 @@
 #!/usr/bin/env node
-const inquirer = require('inquirer');
-const chalk = require('chalk');
-const shell = require('shelljs');
-const { spawnSync } = require('child_process');
-const path = require('path');
-const fs = require('fs');
-const os = require('os');
-const process = require('process');
+import { input } from '@inquirer/prompts';
+import * as chalk from 'chalk';
+import shell from 'shelljs';
+import { spawnSync } from 'child_process';
+import * as path from 'node:path';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as process from 'node:process';
 
 const color = {
-  cmd: chalk.blue,
-  ok: chalk.green,
-  err: chalk.red,
-  info: chalk.cyan,
+  cmd: chalk.default.blue,
+  ok: chalk.default.green,
+  err: chalk.default.red,
+  info: chalk.default.cyan,
 }
 const print = {
   ok: x => console.log(color.ok('[ok] '+x)),
@@ -37,7 +37,7 @@ const gitEnsure = (src, path) => {
 }
 
 const installRun = (cmd, list) => {
-  res = run(cmd)
+  const res = run(cmd)
   if(res.status == 0) {
     print.ok(`Installation ${list} successful`);
     return true;
@@ -48,15 +48,13 @@ const installRun = (cmd, list) => {
 const brewInstall = x => installRun(`brew install ${x.join(' ')}`, x)
 const yayInstall = (...x) => installRun(`yay -S --needed --noconfirm ${x.join(' ')}`, x)
 
-const isOsx = /^darwin/.test(process.platform);
-exports.isOsx = isOsx;
-const isArch = process.platform == 'linux' && fs.existsSync('/usr/bin/pacman');
-exports.isArch = isArch;
+export const isOsx = /^darwin/.test(process.platform);
+export const isArch = process.platform == 'linux' && fs.existsSync('/usr/bin/pacman');
 
 const cannotInstall = x =>
   print.err(`Cannot detect OS to install ${x}`) &&
   shell.exit(1)
-const package = 
+const packages =
   isOsx ? brewInstall :
   isArch ? yayInstall :
   cannotInstall
@@ -68,16 +66,16 @@ const install = (what, exists, installF) => {
 const installCmd = (what, test = null) =>
   (test == null) ? installCmd(what, () => commandExists(what)) :
   (typeof test === 'string') ? installCmd(what, () => commandExists(test)) :
-  install(what, test, () => package(what))
+  install(what, test, () => packages(what))
 const syncFile = (src, dst) => {
-  srcp = path.join('files', src);
+  const srcp = path.join('files', src);
   if(!fs.existsSync(srcp))
     return print.err(`Cannot find source file in ${srcp}`)
   console.log(`${srcp} -> ${dst}`)
   return shell.cp(srcp, dst)
 }
 const syncFiles = (src, dst) => {
-  srcp = path.join('files', src);
+  const srcp = path.join('files', src);
   if(!fs.existsSync(srcp))
     return print.err(`Cannot find source file in ${srcp}`)
   console.log(`${srcp} -> ${dst}`)
@@ -159,7 +157,7 @@ const ensureJson = (path, j) => {
 
 
 // OSX
-exports.installOsxBase = () => {
+export const installOsxBase = () => {
   installCmd('zsh')
   installCmd('git')
   //installCmd('the_silver_searcher', 'ag')
@@ -167,8 +165,8 @@ exports.installOsxBase = () => {
 
 // Arch
 const resolution = '1920x1200'
-exports.installArchBoot = () => {
-  package(
+export const installArchBoot = () => {
+  packages(
     // ui basics
     'xorg', 'lightdm', 'mesa-libgl', 'lightdm-slick-greeter', 'lightdm-settings',
     'gnome-keyring', 'arc-gtk-theme',
@@ -176,8 +174,8 @@ exports.installArchBoot = () => {
     'i3', 'xfce4-terminal', 'picom', 'rofi', 'rofimoji', 'xdotool', 'dunst',
     'gnome-settings-daemon', 'feh', 'udiskie', 'android-tools', 'dmidecode',
     // web
-    //'networkmanager', 'network-manager-applet',
-    'iwd', 'dhcpcd',
+    //'networkmanager', 'network-manager-applet', // which require wpa_supplicant
+    'iwd', 'iw', 'dhcpcd',
     'bluez', 'bluetui',
     'firefox', 'chromium',
     // productivity
@@ -186,9 +184,9 @@ exports.installArchBoot = () => {
     'docker',
   )
 
-  configureLightdm = () => {
-    p = '/etc/lightdm/lightdm.conf'
-    c = fs.readFileSync(p, 'utf-8')
+  const configureLightdm = () => {
+    const p = '/etc/lightdm/lightdm.conf'
+    let c = fs.readFileSync(p, 'utf-8')
     c = c.replace(/^#?greeter-session=.*/m, 'greeter-session=lightdm-slick-greeter')
     syncFiles('xrandr.resize', '/usr/local/bin/xrandr.resize')
     c = c.replace(/^#?display-setup-script=.*/m, `display-setup-script=xrandr.resize`)
@@ -209,7 +207,7 @@ exports.installArchBoot = () => {
 }
 
 // Arch core
-exports.installArchCore = () => {
+export const installArchCore = () => {
   const installYay = () => {
     run("pacman -S --noconfirm git sudo base-devel")
     run("useradd builduser -m && passwd -d builduser && echo 'builduser ALL=(ALL) ALL' >> /etc/sudoers && echo 'root ALL=(ALL) ALL' >> /etc/sudoers")
@@ -217,7 +215,7 @@ exports.installArchCore = () => {
   }
   install('yay', () => fs.existsSync('/usr/bin/yay'), installYay)
 
-  package(
+  packages(
     // basics
     'git', 'diff-so-fancy', 'vim', 'neovim', 'vim-surround', 'curl', 'htop', 'p7zip', 'encfs',
     'openssh', 'sshfs', 'tree', 'net-tools', 'termdown',
@@ -257,7 +255,7 @@ exports.installArchCore = () => {
   install('ylaterhq', () => fs.existsSync('/usr/local/bin/ylaterhq'), () => syncFiles('ylaterhq.sh', '/usr/local/bin/ylaterhq'))
 }
 
-exports.configureZshrc = () => {
+export const configureZshrc = () => {
   // ZSH
   const zshrc = path.join(os.homedir(), '.zshrc')
   const defaultZsh = () => run('chsh -s /bin/zsh')
@@ -270,10 +268,11 @@ exports.configureZshrc = () => {
   }
   install('oh-my-zsh', false, installOhMyZsh)
 
-  c = fs.readFileSync(zshrc, 'utf-8')
+  let c = fs.readFileSync(zshrc, 'utf-8')
   c = c.replace(/ZSH_THEME=.*/, 'ZSH_THEME="zero-dark"')
   c = c.replace(/^plugins=\((.+[\s\S])+\)/m, 'plugins=(git zero)')
   ensure = x => { if(!c.includes(x)) c += "\n"+x; }
+
   ensure('export GOPATH=/pub/go')
   ensure('export $(gnome-keyring-daemon -s)')
   ensure('PATH=/pub/go/bin:$PATH')
@@ -290,7 +289,7 @@ exports.configureZshrc = () => {
   fs.writeFileSync(zshrc, c)
 }
 
-exports.installCore = () => {
+export const installCore = () => {
   // UI configs
   // Gtk config with dark color theme
   const gtkVariant = 'dark'
@@ -300,7 +299,7 @@ exports.installCore = () => {
   install('gtk3 config', false, () => syncFile('gtk3settings.'+gtkVariant+'.ini', gtk3confPath))
 
   // gnome-screenshots autosave location to ~/Screenshots
-  screenspath = path.join(os.homedir(), "Screenshots")
+  const screenspath = path.join(os.homedir(), "Screenshots")
   install('~/Screenshots', () => fs.existsSync(screenspath), () => run(`mkdir ${screenspath}`))
   run('gsettings set org.gnome.gnome-screenshot auto-save-directory "file:///home/$USER/Screenshots/"')
 
@@ -324,12 +323,12 @@ exports.installCore = () => {
   install('xfce4-terminal', false, configureTerm)
 
   // international input
-  package('fcitx5', 'fcitx5-configtool', 'fcitx5-qt', 'fcitx5-gtk', 'fcitx5-mozc', 'fcitx5-hangul')
+  packages('fcitx5', 'fcitx5-configtool', 'fcitx5-qt', 'fcitx5-gtk', 'fcitx5-mozc', 'fcitx5-hangul')
   // TODO: users must enable it via:
   // systemctl --user enable app-org.fcitx.Fcitx5@autostart.service
 
   // zero tools
-  toolsHome = path.join(os.homedir(), '.zero.tools')
+  const toolsHome = path.join(os.homedir(), '.zero.tools')
   syncFiles('zero.tools', toolsHome)
   run([
     'cd '+toolsHome,
@@ -340,7 +339,14 @@ exports.installCore = () => {
   ].join(' && '))
 }
 
-exports.installDevEnv = () => {
+export const GitSettings = () => {
+  return {
+    name: runq('git config --global user.name').stdout.toString().trim(),
+    email: runq('git config --global user.email').stdout.toString().trim(),
+  }
+}
+
+export const installDevEnv = (name, email) => {
   // ssh config
   const sshconfPath = path.join(os.homedir(), '.ssh/config')
   syncFile('user_ssh_config', sshconfPath)
@@ -352,26 +358,19 @@ exports.installDevEnv = () => {
     run(`git config --global user.name "${x.name}"`)
     run(`git config --global user.email "${x.email}"`)
   }
-  const gitconfSettings = () => {
-    print.info('configure global git settings')
-    print.info('please answer the following questions:')
-    q = [
-      { type: 'input', name: 'name', message: 'What is your name?' },
-      { type: 'input', name: 'email', message: 'What is your email?' },
-    ]
-    return inquirer.prompt(q).then(gitconfSet)
-  }
   const installGitconf = () => {
-    o = {
-      name: runq('git config --global user.name').stdout.toString().trim(),
-      email: runq('git config --global user.email').stdout.toString().trim(),
-    };
+    ;
     syncFile('gitconfig', gitconfPath)
-    if(o.name == 'Your Name') o.name = '';
-    o.name = process.env.GIT_USER_NAME || o.name
-    o.email = process.env.GIT_USER_EMAIL || o.email
-    if(o.name == '' || o.email == '') gitconfSettings()
-    else gitconfSet(o);
+    let changed = false
+    if(name != '' && name != o.name) {
+      o.name = name;
+      changed = true;
+    }
+    if(email != '' && email != o.email) {
+      o.email = email;
+      changed = true;
+    }
+    if(changed) gitconfSet(o);
   }
   install('gitconfig', false, installGitconf)
 
@@ -540,16 +539,20 @@ exports.installDevEnv = () => {
   install('protoc', false, () => commandExists('go get -u github.com/golang/protobuf/protoc-gen-go'))
 }
 
-exports.installAmdGraphics = () => {
-  configureMultilib = () => {
-    p = '/etc/pacman.conf'
-    c = fs.readFileSync(p, 'utf-8')
+export const installAmdGraphics = () => {
+  const configureMultilib = () => {
+    const p = '/etc/pacman.conf'
+    let c = fs.readFileSync(p, 'utf-8')
     c = c.replace(/^#?\[multilib\].*\n#?.*/m, '[multilib]\nInclude = /etc/pacman.d/mirrorlist')
     fs.writeFileSync('/etc/pacman.conf', c)
   }
   install('configure multilib', false, configureMultilib)
 
-  package(
+  packages(
     'lib32-mesa', 'xf86-video-amdgpu', 'vulkan-radeon',
   )
+}
+
+export const installAsServer = () => {
+  syncFile('udev.no-powersave.rules', '/etc/udev/rules.d/81-wifi-powersave.rules')
 }
