@@ -218,8 +218,8 @@ export const installArchCore = () => {
   packages(
     // basics
     'git', 'diff-so-fancy', 'vim', 'neovim', 'vim-surround', 'curl', 'htop', 'p7zip', 'encfs',
-    'openssh', 'sshfs', 'tree', 'net-tools', 'termdown',
-    // deps for parallels tools
+    'openssh', 'sshfs', 'tree', 'net-tools', 'termdown', 'gdu',
+    // deps for dev
     'base-devel', 'pnpm', 'python-pip',
     // cli tools
     'zsh', 'the_silver_searcher', 'jq', 'yq', 'ttf-inconsolata',
