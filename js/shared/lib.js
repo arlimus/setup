@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { input } from '@inquirer/prompts';
 import * as chalk from 'chalk';
 import shell from 'shelljs';
 import { spawnSync } from 'child_process';
@@ -88,9 +87,9 @@ const syncFiles = (src, dst) => {
 
 const writeFile = (path, content) => {
   if(path.startsWith(os.homedir()))
-    return fs.writeFileSync(path, res)
+    return fs.writeFileSync(path, content)
   // for anything else let's use sudo
-  fs.writeFileSync('/tmp/ensurelines', res)
+  fs.writeFileSync('/tmp/ensurelines', content)
   run(`sudo mv /tmp/ensurelines ${path}`)
 }
 
@@ -173,16 +172,21 @@ export const installArchBoot = () => {
     // i3
     'i3', 'xfce4-terminal', 'picom', 'rofi', 'rofimoji', 'xdotool', 'dunst',
     'gnome-settings-daemon', 'feh', 'udiskie', 'android-tools', 'dmidecode',
-    // web
-    //'networkmanager', 'network-manager-applet', // which require wpa_supplicant
+    // filesystems
+    'btrfs-progs',
+    // networking
     'iwd', 'iw', 'dhcpcd',
+    // bluetooth
     'bluez', 'bluetui',
-    'firefox', 'chromium',
-    // productivity
-    //'gimp', 'telegram-desktop-bin', 'slack-desktop',
-    'gthumb', 'gnome-screenshot', 'zathura', 'zathura-pdf-mupdf', 'zathura-cb', 'mediainfo',
-    'docker',
   )
+
+  // Why not NetworkManager?
+  // It's a great alternative, but I found it pulls other dependencies like
+  // wpa_supplicant that all overlapped with existing services.
+  // For UI-based config and applets its better and recommended, but you
+  // should install it with iwd backend if you keep iwd around.
+  //
+  // 'networkmanager', 'network-manager-applet', 'networkmanager-iwd',
 
   const configureLightdm = () => {
     const p = '/etc/lightdm/lightdm.conf'
@@ -196,14 +200,38 @@ export const installArchBoot = () => {
   }
   install('configure lightdm', false, configureLightdm)
   run('sudo systemctl enable lightdm')
-  run('sudo systemctl enable NetworkManager')
-  run('sudo systemctl enable docker')
-  run('sudo systemctl start docker')
 
   run('sudo ln -sf /usr/lib/systemd/scripts/ /etc/init.d')
   run('sudo touch /etc/X11/xorg.conf')
 
   syncFiles('inco.desktop', '/usr/share/applications/inco.desktop')
+}
+
+export const installContainerRuntime = (username) => {
+  packages(
+    'docker', 'docker-rootless-extras',
+  )
+  // For regular root-based docker service:
+  // run('sudo systemctl enable docker')
+  // run('sudo systemctl start docker')
+
+  if(username == null || username == "") {
+    console.log("WARNING: Missing username for rootless docker setup, please run this again as a regular user")
+    return
+  }
+  if(username == 'root') {
+    console.log("WARNING: Won't complete setup for rootless docker, please run this again as a regular user")
+    return
+  }
+
+  // We go for rootless for more security:
+  writeFile('/etc/subuid', username + ':100000:65536')
+  writeFile('/etc/subgid', username + ':100000:65536')
+
+  run('systemctl --user enable docker.service')
+  run('docker context create rootless --description "Rootless mode" --docker "host=unix:///run/user/$(id -u)/docker.sock"')
+  run('docker context use rootless')
+  run('systemctl --user start docker.service')
 }
 
 // Arch core
@@ -217,12 +245,14 @@ export const installArchCore = () => {
 
   packages(
     // basics
-    'git', 'diff-so-fancy', 'vim', 'neovim', 'vim-surround', 'curl', 'htop', 'p7zip', 'encfs',
+    'git', 'diff-so-fancy', 'curl', 'htop', 'p7zip', 'encfs', 'pwgen',
     'openssh', 'sshfs', 'tree', 'net-tools', 'termdown', 'gdu', 'renameutils',
     // deps for dev
     'base-devel', 'pnpm', 'python-pip',
+    // editor
+    'vim', 'neovim', 'vim-surround',
     // cli tools
-    'zsh', 'the_silver_searcher', 'jq', 'yq', 'ttf-inconsolata',
+    'the_silver_searcher', 'jq', 'yq', 'ttf-inconsolata',
     'bat', 'fzf', 'ripgrep',
     // productivity
     'go', 'imagemagick', 'graphicsmagick', 'maim', 'xclip',
@@ -235,6 +265,10 @@ export const installArchCore = () => {
     'vorbis-tools', 'opus-tools', 'advcpmv', 'obs-studio',
     // fonts
     'noto-fonts', 'noto-fonts-emoji', 'noto-fonts-extra', 'noto-fonts-cjk',
+    // web
+    'firefox', 'chromium',
+    // productivity
+    'gthumb', 'gnome-screenshot', 'zathura', 'zathura-pdf-mupdf', 'zathura-cb', 'mediainfo',
     // comms
     'discord', 'slack-desktop', 'telegram-desktop',
   )
@@ -255,7 +289,9 @@ export const installArchCore = () => {
   install('ylaterhq', () => fs.existsSync('/usr/local/bin/ylaterhq'), () => syncFiles('ylaterhq.sh', '/usr/local/bin/ylaterhq'))
 }
 
-export const configureZshrc = () => {
+export const configureZsh = () => {
+  packages('zsh')
+
   // ZSH
   const zshrc = path.join(os.homedir(), '.zshrc')
   const defaultZsh = () => run('chsh -s /bin/zsh')

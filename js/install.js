@@ -1,5 +1,30 @@
 import * as setup from './shared/lib.js';
-import { select, input } from '@inquirer/prompts';
+import { select, input, checkbox } from '@inquirer/prompts';
+import os from 'os';
+
+const INSTALL_CORE = 'core'
+const INSTALL_DEV = 'dev'
+const INSTALL_ZSH = 'zsh'
+const INSTALL_CONTAINER = 'container'
+
+const scope = await checkbox({
+  message: 'Select all the things to install',
+  choices: [
+    {name: 'Core', value: INSTALL_CORE},
+    {name: 'Dev Env', value: INSTALL_DEV},
+    {name: 'Zsh', value: INSTALL_ZSH},
+    {name: 'Container Runtime', value: INSTALL_CONTAINER},
+  ]
+})
+
+try {
+  const userInfo = os.userInfo();
+  const username = userInfo.username;
+  console.log("Username: "+username)
+} catch(err) {
+  console.log("Error getting userinfo: ", err)
+  process.exit(1)
+}
 
 const installMode = await select({
   message: 'Select the installation mode',
@@ -37,26 +62,38 @@ const o = setup.GitSettings()
 if(o.name == '') {
   o.name = await input({ message: 'What is your name? (used for git settings)' });
 } else {
-  console.log("Name: "+o.name)
+  console.log("Git Name: "+o.name)
 }
 if(o.email == '') {
   o.email = await input({ message: 'What is your email? (used for git settings)' });
 } else {
-  console.log("Email: "+o.email)
+  console.log("Git Email: "+o.email)
 }
 
 if(setup.isArch) {
-  setup.installArchBoot()
-  setup.installArchCore()
+  if(scope.includes(INSTALL_CORE)) {
+    setup.installArchBoot()
+    setup.installArchCore()
+  }
+  if(scope.includes(INSTALL_CONTAINER)) {
+    setup.installContainerRuntime(username)
+  }
 }
 
 if(setup.isOsx) {
-  setup.installOsxBase()
+  if(scope.includes(INSTALL_CORE)) {
+    setup.installOsxBase()
+  }
 }
 
-setup.configureZshrc()
-setup.installCore()
-setup.installDevEnv(o.name, o.email)
+if(scope.includes(INSTALL_ZSH)) {
+  setup.configureZsh()
+}
+
+if(scope.includes(INSTALL_DEV)) {
+  setup.installDevEnv(o.name, o.email)
+}
+
 if(installMode == 'server') {
   setup.installAsServer()
 }
