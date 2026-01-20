@@ -258,7 +258,7 @@ export const installArchCore = () => {
     'go', 'imagemagick', 'graphicsmagick', 'maim', 'xclip',
     'code', 'meld', 'colordiff', 'httpie', 'protobuf', 'rsync',
     // audio config
-    'pipewire', 'pavucontrol',
+    'pipewire', 'pavucontrol', 'rtkit', 'realtime-privileges',
     // video-tools
     'inotify-tools', 'yt-dlp', 'x265', 'mpv', 'alsa-utils',
     'mkvtoolnix-cli', 'ffmpeg',
