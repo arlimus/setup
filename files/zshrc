@@ -100,6 +100,12 @@ source $ZSH/oh-my-zsh.sh
 
 export PATH=$HOME/.yarn/bin:$HOME/.local/bin:$PATH
 export $(gnome-keyring-daemon -s)
+
+systemctl --user start app-org.fcitx.Fcitx5@autostart.service
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS=@im=fcitx
+
 export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
 
 export GOPATH=/pub/go
