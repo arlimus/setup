@@ -39,10 +39,10 @@ ba = branch -a
 bi = bisect
 cl = clone
 co = checkout
-com = !git checkout "$(git rev-list HEAD --max-count 1)" && git branch -d master && git checkout master
-corm = !git checkout $1 && git rebase origin/master
-cofm = !git fetch --all --prune && git checkout $1 && git rebase origin/master
-codm = !NAME=$(git rev-parse --abbrev-ref HEAD) && test -n "$NAME" && git fetch --all --prune && git checkout master && git pull && git branch -d "$NAME"
+com = !git checkout "$(git rev-list HEAD --max-count 1)" && git branch -d main && git checkout main
+corm = !git checkout $1 && git rebase origin/main
+cofm = !git fetch --all --prune && git checkout $1 && git rebase origin/main
+codm = !NAME=$(git rev-parse --abbrev-ref HEAD) && test -n "$NAME" && git fetch --all --prune && git checkout main && git pull && git branch -d "$NAME"
 
 d  = diff --color
 dc = diff --color --cached
@@ -99,8 +99,8 @@ rp = remote prune
 
 r  = reset
 ri = rebase -i
-rim= rebase -i master
-rio= rebase -i origin/master
+rim= rebase -i main
+rio= rebase -i origin/main
 rss= reset --soft HEAD^
 rsh= reset --soft HEAD
 rhh= reset --hard HEAD
@@ -145,7 +145,7 @@ file-view-vpane-position = 530
 
 # Helpful to remember:
 # * create a patch
-#   git format-patch origin/master..HEAD --stdout > update.patch
+#   git format-patch origin/main..HEAD --stdout > update.patch
 # * apply a patch
 #   git am --signoff < update.patch 
 
