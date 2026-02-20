@@ -247,7 +247,7 @@ export const installArchCore = () => {
     // basics
     'git', 'diff-so-fancy', 'curl', 'htop', 'p7zip', 'encfs', 'pwgen',
     'openssh', 'sshfs', 'tree', 'net-tools', 'termdown', 'gdu', 'renameutils',
-    'rclone',
+    'rclone', 'claude-code', 'openai-codex',
     // deps for dev
     'base-devel', 'pnpm', 'python-pip',
     // editor
@@ -442,6 +442,25 @@ export const installDevEnv = (name, email) => {
     'wix.vscode-import-cost',
     'fabiospampinato.vscode-todo-plus',
     'github.github-vscode-theme'
+  )
+
+  // Claude Code plugins
+  const claudeMarketplaces = runq('claude plugin marketplace list').stdout.toString().trim().split(/\r?\n/)
+  const claudeMarketplace = (...x) =>
+    x.forEach(y => install(`claude marketplace: ${y}`, () => claudeMarketplaces.some(l => l.includes(y)), () => run(`claude plugin marketplace add ${y}`)))
+
+  claudeMarketplace(
+    'anthropics/claude-code',
+  )
+
+  const claudeExist = runq('claude plugin list').stdout.toString().trim().split(/\r?\n/)
+  const claudePlugins = (...x) =>
+    x.forEach(y => install(`claude: ${y}`, () => claudeExist.some(l => l.includes(y)), () => run(`claude plugin install ${y}`)))
+
+  claudePlugins(
+    'frontend-design@claude-plugins-official',
+    'gopls-lsp@claude-plugins-official',
+    'typescript-lsp@claude-plugins-official',
   )
 
   ensureJson(path.join(os.homedir(), '.config/Code - OSS/User/settings.json'),
