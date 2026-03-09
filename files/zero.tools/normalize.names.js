@@ -281,6 +281,12 @@ const normalizeSequence = (name, prefix, numLen) => {
   // special handling for base:
   // - cover.anything.jpg ==> prefix.000.cover.anything.jpg
   if(base.match(/cover/)) return prefix + "." + ("0").padStart(numLen,"0") + "." + base.replace(/.*cover/, "cover");
+  // - ... p123 ... ==> prefix.000.123.jpg
+  let pageM = base.match(/[ .]p\d+[ .]/);
+  if(pageM != null) {
+    let suffix = base.match(/\.[^.]+$/)
+    return prefix + "." + pageM[0].match(/\d+/)[0] + suffix
+  }
   // - 000.12.jpg ==> prefix.000.12.jpg
   if(base.match(/000\.\d+/)) return prefix + "." + base;
   // - 000a.jpg ==> prefix.000.a.jpg
