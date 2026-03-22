@@ -247,7 +247,7 @@ export const installArchCore = () => {
     // basics
     'git', 'diff-so-fancy', 'curl', 'htop', 'p7zip', 'encfs', 'pwgen',
     'openssh', 'sshfs', 'tree', 'net-tools', 'termdown', 'gdu', 'renameutils',
-    'rclone', 'claude-code', 'openai-codex',
+    'rclone', 'claude-code', 'openai-codex', 'github-cli',
     // deps for dev
     'base-devel', 'pnpm', 'python-pip',
     // editor

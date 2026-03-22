@@ -33,6 +33,8 @@ a  = add --all
 ap = add -p
 au = add --update
 
+pot = !git push -u origin $(git rev-parse --abbrev-ref HEAD)
+
 b  = branch
 ba = branch -a
 
@@ -154,3 +156,11 @@ file-view-vpane-position = 530
 
 [interactive]
 	diffFilter = diff-so-fancy --patch
+[credential "https://github.com"]
+	helper =
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/usr/bin/gh auth git-credential
+[gpg]
+	format = ssh
