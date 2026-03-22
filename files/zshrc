@@ -109,21 +109,19 @@ export XMODIFIERS=@im=fcitx
 export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
 
 export GOPATH=/pub/go
-export PATH=/pub/go/bin:$PATH
-
-export GEM_HOME="$(ruby -e 'puts Gem.user_dir')"
-export PATH="$PATH:$GEM_HOME/bin"
-
-alias ya="yt-dlp -f bestaudio --audio-quality 0 -i -x --extract-audio"
-alias yav="yt-dlp -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"
-alias yav1080="yt-dlp -f 248"
-alias ytdl="yt-dlp -f 'bv*[height<=720]+ba*[abr<=128]'"
+export GOBIN=/pub/go/bin
+export $(gnome-keyring-daemon -s)
+PATH=/pub/go/bin:$PATH
+alias b="bundle exec"
+alias ya="yt-dlp -f bestaudio --audio-quality 0 -i -x --extract-audio --no-playlist"
+alias yav="yt-dlp -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv --no-playlist"
 alias y="yay --color auto"
 alias findlarge="find . -type f -exec du -h {} + | sort -h"
 alias yaml2json="python3 -c 'import sys; import yaml; import json; json.dump(yaml.safe_load(sys.stdin.read(-1)), sys.stdout)'"
 v2a() { ffmpeg -i "$1" -vn -acodec libvorbis -q:a 6 "#1".ogg }
 v2mp4() { ffmpeg -i "$1" -c:v libx264 -c:a copy "$1".mp4 }
-alias mpvs="mpv --af=scaletempo=speed=tempo:stride=30 --speed=2.25"
+alias mpvs="mpv --speed=2.5 -af=scaletempo=stride=16:overlap=.68:search=20"
+alias battery="cat /sys/class/power_supply/BAT0/capacity"
 
 alias cp="acp -gni "
 alias mv="amv -gni "
@@ -135,3 +133,4 @@ alias btoff="rfkill block bluetooth"
 # add: ... && bluetoothctl connect AA:BB:CC:DD:EE:FF  <= your device
 alias bton="rfkill unblock bluetooth && sleep 1"
 
+alias ghpr='gh pr create --title "$(git log main..HEAD --reverse --format=%s | head -1)" --body ""'
