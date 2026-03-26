@@ -6,10 +6,10 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/charmbracelet/bubbles/textinput"
-	"github.com/charmbracelet/bubbles/textarea"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/bubbles/v2/textarea"
+	"charm.land/bubbles/v2/textinput"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 )
 
 type commitType struct {
@@ -37,23 +37,24 @@ const (
 )
 
 type model struct {
-	field       int
-	typeIdx     int
-	title       textinput.Model
-	body        textarea.Model
-	err         string
-	done        bool
-	committed   bool
-	commitMsg   string
-	width       int
-	height      int
+	field      int
+	typeIdx    int
+	typeSearch string
+	title      textinput.Model
+	body       textarea.Model
+	err        string
+	done       bool
+	committed  bool
+	commitMsg  string
+	width      int
+	height     int
 }
 
 func initialModel() model {
 	ti := textinput.New()
 	ti.Placeholder = "commit title (required)"
 	ti.CharLimit = 120
-	ti.Width = 60
+	ti.SetWidth(60)
 
 	ta := textarea.New()
 	ta.Placeholder = "commit body (optional, enter to confirm)"
@@ -80,10 +81,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 		return m, nil
 
-	case tea.KeyMsg:
-		// Global quit
-		switch msg.String() {
-		case "ctrl+c", "esc":
+	case tea.KeyPressMsg:
+		key := msg.Key()
+		if key.Code == 'c' && key.Mod.Contains(tea.ModCtrl) {
 			return m, tea.Quit
 		}
 
@@ -100,39 +100,76 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) updateType(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
-	switch msg.String() {
-	case "up", "k":
+func (m model) updateType(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
+	key := msg.Key()
+	switch key.Code {
+	case tea.KeyEscape:
+		if m.typeSearch != "" {
+			m.typeSearch = ""
+		} else {
+			return m, tea.Quit
+		}
+	case 'w':
+		if key.Mod.Contains(tea.ModCtrl) {
+			m.typeSearch = ""
+		} else {
+			m.appendSearch(key)
+		}
+	case tea.KeyUp:
 		if m.typeIdx > 0 {
 			m.typeIdx--
 		}
-	case "down", "j":
+		m.typeSearch = ""
+	case tea.KeyDown:
 		if m.typeIdx < len(commitTypes)-1 {
 			m.typeIdx++
 		} else {
 			m.field = fieldTitle
-			m.title.Focus()
-			return m, textinput.Blink
+			cmd := m.title.Focus()
+			m.typeSearch = ""
+			return m, cmd
 		}
-	case "enter":
+		m.typeSearch = ""
+	case tea.KeyEnter:
 		m.field = fieldTitle
-		m.title.Focus()
-		return m, textinput.Blink
+		cmd := m.title.Focus()
+		m.typeSearch = ""
+		return m, cmd
+	case tea.KeyBackspace:
+		if len(m.typeSearch) > 0 {
+			m.typeSearch = m.typeSearch[:len(m.typeSearch)-1]
+		}
+	default:
+		m.appendSearch(key)
 	}
 	return m, nil
 }
 
-func (m model) updateTitle(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
-	switch msg.String() {
-	case "up":
+func (m *model) appendSearch(key tea.Key) {
+	if key.Text != "" {
+		m.typeSearch += key.Text
+		query := strings.ToLower(m.typeSearch)
+		for i, ct := range commitTypes {
+			if strings.Contains(strings.ToLower(ct.label), query) {
+				m.typeIdx = i
+				break
+			}
+		}
+	}
+}
+
+func (m model) updateTitle(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
+	key := msg.Key()
+	switch key.Code {
+	case tea.KeyEscape, tea.KeyUp:
 		m.title.Blur()
 		m.field = fieldType
 		return m, nil
-	case "down", "enter":
+	case tea.KeyDown, tea.KeyEnter:
 		m.title.Blur()
 		m.field = fieldBody
-		m.body.Focus()
-		return m, textarea.Blink
+		cmd := m.body.Focus()
+		return m, cmd
 	default:
 		var cmd tea.Cmd
 		m.title, cmd = m.title.Update(msg)
@@ -140,27 +177,32 @@ func (m model) updateTitle(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	}
 }
 
-func (m model) updateBody(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
-	switch msg.String() {
-	case "up":
-		// If cursor is on the first line, navigate to title
+func (m model) updateBody(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
+	key := msg.Key()
+	switch key.Code {
+	case tea.KeyEscape:
+		m.body.Blur()
+		m.field = fieldTitle
+		cmd := m.title.Focus()
+		return m, cmd
+	case tea.KeyUp:
 		if m.body.Line() == 0 {
 			m.body.Blur()
 			m.field = fieldTitle
-			m.title.Focus()
-			return m, textinput.Blink
+			cmd := m.title.Focus()
+			return m, cmd
 		}
 		var cmd tea.Cmd
 		m.body, cmd = m.body.Update(msg)
 		return m, cmd
-	case "enter":
-		// Enter confirms (even if empty)
+	case tea.KeyEnter:
+		if key.Mod.Contains(tea.ModShift) || key.Mod.Contains(tea.ModAlt) {
+			m.body.InsertString("\n")
+			return m, nil
+		}
+		// Plain enter confirms
 		m.body.Blur()
 		return m.doCommit()
-	case "shift+enter", "alt+enter":
-		// Insert newline
-		m.body.InsertString("\n")
-		return m, nil
 	default:
 		var cmd tea.Cmd
 		m.body, cmd = m.body.Update(msg)
@@ -173,8 +215,8 @@ func (m model) doCommit() (tea.Model, tea.Cmd) {
 	if title == "" {
 		m.err = "title cannot be empty"
 		m.field = fieldTitle
-		m.title.Focus()
-		return m, textinput.Blink
+		cmd := m.title.Focus()
+		return m, cmd
 	}
 
 	ct := commitTypes[m.typeIdx]
@@ -197,20 +239,24 @@ func (m model) doCommit() (tea.Model, tea.Cmd) {
 var (
 	labelStyle    = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("12"))
 	selectedStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("10"))
-	dimStyle      = lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
+	dimStyle      = lipgloss.NewStyle().Foreground(lipgloss.Color("245"))
 	errStyle      = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("9"))
 	cursorStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("10"))
 )
 
-func (m model) View() string {
+func (m model) View() tea.View {
 	if m.done {
-		return ""
+		return tea.NewView("")
 	}
 
 	var b strings.Builder
 
 	// Type selector
-	b.WriteString(labelStyle.Render("Type") + "\n")
+	if m.field == fieldType && m.typeSearch != "" {
+		b.WriteString(labelStyle.Render("Type") + " " + dimStyle.Render("search: ") + m.typeSearch + "\n")
+	} else {
+		b.WriteString(labelStyle.Render("Type") + "\n")
+	}
 	for i, ct := range commitTypes {
 		cursor := "  "
 		style := dimStyle
@@ -239,9 +285,9 @@ func (m model) View() string {
 		b.WriteString("\n" + errStyle.Render(m.err) + "\n")
 	}
 
-	b.WriteString("\n" + dimStyle.Render("enter: confirm • esc: cancel") + "\n")
+	b.WriteString("\n" + dimStyle.Render("enter: confirm • esc: back") + "\n")
 
-	return b.String()
+	return tea.NewView(b.String())
 }
 
 func main() {
