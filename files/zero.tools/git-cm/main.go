@@ -18,15 +18,15 @@ type commitType struct {
 }
 
 var commitTypes = []commitType{
-	{"✨", "small feature"},
-	{"⭐", "medium feature"},
-	{"🌟", "major feature"},
-	{"🧹", "clean-up"},
+	{"✨", "small feature (sparkles)"},
+	{"⭐", "medium feature (star)"},
+	{"🌟", "major feature (bright star)"},
+	{"🧹", "clean-up (broom)"},
 	{"🐛", "bugfix"},
-	{"🍉", "ui feature"},
-	{"🌈", "ux / design"},
-	{"🏇", "speed / race condition"},
-	{"🛑", "breaking feature"},
+	{"🍉", "ui feature (melon)"},
+	{"🌈", "ux / design (rainbow)"},
+	{"🏇", "speed / race condition (horse)"},
+	{"🛑", "breaking feature (stop)"},
 	{"🟢", "get tests green"},
 }
 
