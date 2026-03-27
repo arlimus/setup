@@ -1,0 +1,292 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"os/exec"
+	"regexp"
+	"strings"
+
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
+)
+
+type commit struct {
+	hash   string
+	title  string
+	merged bool
+}
+
+type branch struct {
+	name    string
+	commits []commit
+}
+
+func (b branch) mergedCount() int {
+	n := 0
+	for _, c := range b.commits {
+		if c.merged {
+			n++
+		}
+	}
+	return n
+}
+
+// git helpers
+
+func git(args ...string) (string, error) {
+	out, err := exec.Command("git", args...).Output()
+	return strings.TrimSpace(string(out)), err
+}
+
+func mainRef() string {
+	for _, ref := range []string{"origin/main", "origin/master", "main", "master"} {
+		if _, err := git("rev-parse", "--verify", ref); err == nil {
+			return ref
+		}
+	}
+	return "main"
+}
+
+func loadBranches() []branch {
+	ref := mainRef()
+	out, err := git("branch", "--format=%(refname:short)")
+	if err != nil {
+		return nil
+	}
+	cur, _ := git("rev-parse", "--abbrev-ref", "HEAD")
+
+	var result []branch
+	for _, name := range strings.Split(out, "\n") {
+		name = strings.TrimSpace(name)
+		if name == "" || name == "main" || name == "master" || name == cur {
+			continue
+		}
+
+		b := branch{name: name}
+		base, err := git("merge-base", ref, name)
+		if err != nil {
+			result = append(result, b)
+			continue
+		}
+
+		branchLog, _ := git("log", "--format=%h %s", base+".."+name)
+		mainLog, _ := git("log", "--format=%s", base+".."+ref)
+
+		titles := map[string]bool{}
+		prSuffix := regexp.MustCompile(`\s+\(#\d+\)$`)
+		for _, t := range strings.Split(mainLog, "\n") {
+			if t = strings.TrimSpace(t); t != "" {
+				titles[t] = true
+				titles[prSuffix.ReplaceAllString(t, "")] = true
+			}
+		}
+
+		for _, line := range strings.Split(branchLog, "\n") {
+			if line = strings.TrimSpace(line); line == "" {
+				continue
+			}
+			if p := strings.SplitN(line, " ", 2); len(p) == 2 {
+				b.commits = append(b.commits, commit{
+					hash:   p[0],
+					title:  p[1],
+					merged: titles[p[1]],
+				})
+			}
+		}
+		result = append(result, b)
+	}
+	return result
+}
+
+// styles
+
+var (
+	titleSt  = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("12"))
+	okSt     = lipgloss.NewStyle().Foreground(lipgloss.Color("10"))
+	failSt   = lipgloss.NewStyle().Foreground(lipgloss.Color("9"))
+	dimSt    = lipgloss.NewStyle().Foreground(lipgloss.Color("245"))
+	selSt    = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("10"))
+	hashSt   = lipgloss.NewStyle().Foreground(lipgloss.Color("245"))
+	accentSt = lipgloss.NewStyle().Foreground(lipgloss.Color("12"))
+)
+
+func pane(w int) lipgloss.Style {
+	return lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color("8")).
+		Width(w).
+		Padding(0, 1)
+}
+
+// model
+
+type model struct {
+	branches []branch
+	cursor   int
+	width    int
+	height   int
+	msg      string
+	msgErr   bool
+}
+
+func (m model) Init() tea.Cmd { return nil }
+
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.width = msg.Width
+		m.height = msg.Height
+	case tea.KeyPressMsg:
+		k := msg.Key()
+		if k.Code == 'c' && k.Mod.Contains(tea.ModCtrl) {
+			return m, tea.Quit
+		}
+		m.msg = ""
+		switch k.Code {
+		case 'q', tea.KeyEscape:
+			return m, tea.Quit
+		case tea.KeyUp, 'k':
+			if m.cursor > 0 {
+				m.cursor--
+			}
+		case tea.KeyDown, 'j':
+			if m.cursor < len(m.branches)-1 {
+				m.cursor++
+			}
+		case 'd':
+			if len(m.branches) == 0 {
+				break
+			}
+			name := m.branches[m.cursor].name
+			if err := exec.Command("git", "branch", "-D", name).Run(); err != nil {
+				m.msg = fmt.Sprintf("cannot delete %s", name)
+				m.msgErr = true
+			} else {
+				m.msg = fmt.Sprintf("deleted %s", name)
+				m.msgErr = false
+				m.branches = append(m.branches[:m.cursor], m.branches[m.cursor+1:]...)
+				if m.cursor >= len(m.branches) && m.cursor > 0 {
+					m.cursor--
+				}
+			}
+		}
+	}
+	return m, nil
+}
+
+func (m model) View() tea.View {
+	if len(m.branches) == 0 {
+		s := dimSt.Render("no local branches to clean")
+		if m.msg != "" {
+			s = okSt.Render("✓ "+m.msg) + "\n" + s
+		}
+		return tea.NewView(s + "\n")
+	}
+
+	w := m.width - 2
+	if w < 40 {
+		w = 78
+	}
+
+	b := m.branches[m.cursor]
+
+	// main pane: commit comparison
+	var main strings.Builder
+
+	mc, total := b.mergedCount(), len(b.commits)
+	var summary string
+	switch {
+	case total == 0:
+		summary = dimSt.Render("no commits")
+	case mc == total:
+		summary = okSt.Render(fmt.Sprintf("✓ %d/%d on main", mc, total))
+	default:
+		summary = failSt.Render(fmt.Sprintf("%d/%d on main", mc, total))
+	}
+	main.WriteString(titleSt.Render(b.name) + "  " + summary + "\n")
+
+	maxC := m.height - 16
+	if maxC < 5 {
+		maxC = 20
+	}
+	commits := b.commits
+	if len(commits) > maxC {
+		commits = commits[:maxC]
+	}
+	for _, c := range commits {
+		if c.merged {
+			main.WriteString(okSt.Render("  ✓ ") + hashSt.Render(c.hash) + " " + dimSt.Render(c.title) + "\n")
+		} else {
+			main.WriteString(failSt.Render("  ✗ ") + hashSt.Render(c.hash) + " " + c.title + "\n")
+		}
+	}
+	if len(b.commits) > maxC {
+		main.WriteString(dimSt.Render(fmt.Sprintf("  … %d more", len(b.commits)-maxC)) + "\n")
+	}
+
+	mainBox := pane(w).Render(strings.TrimRight(main.String(), "\n"))
+
+	// bottom pane: branch list
+	var bot strings.Builder
+	bot.WriteString(accentSt.Render(fmt.Sprintf("branches · %d total", len(m.branches))) + "\n")
+
+	maxShow := 5
+	start := m.cursor - 2
+	if start < 0 {
+		start = 0
+	}
+	end := start + maxShow
+	if end > len(m.branches) {
+		end = len(m.branches)
+		start = end - maxShow
+		if start < 0 {
+			start = 0
+		}
+	}
+	for i := start; i < end; i++ {
+		br := m.branches[i]
+		cur, ns := "  ", dimSt
+		if i == m.cursor {
+			cur = selSt.Render("▸ ")
+			ns = selSt
+		}
+		mc, total := br.mergedCount(), len(br.commits)
+		var st string
+		switch {
+		case total == 0:
+			st = dimSt.Render("—")
+		case mc == total:
+			st = okSt.Render("✓")
+		default:
+			st = failSt.Render(fmt.Sprintf("%d/%d", mc, total))
+		}
+		bot.WriteString(fmt.Sprintf("%s%s  %s\n", cur, ns.Render(br.name), st))
+	}
+
+	botBox := pane(w).Render(strings.TrimRight(bot.String(), "\n"))
+
+	var out strings.Builder
+	out.WriteString(mainBox + "\n")
+	out.WriteString(botBox + "\n")
+
+	if m.msg != "" {
+		if m.msgErr {
+			out.WriteString("  " + failSt.Render("✗ "+m.msg) + "\n")
+		} else {
+			out.WriteString("  " + okSt.Render("✓ "+m.msg) + "\n")
+		}
+	}
+
+	out.WriteString(dimSt.Render("  d: delete · ↑↓: navigate · q: quit") + "\n")
+
+	return tea.NewView(out.String())
+}
+
+func main() {
+	p := tea.NewProgram(model{branches: loadBranches()})
+	if _, err := p.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+}
