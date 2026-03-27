@@ -32,6 +32,12 @@ func pane(w int) lipgloss.Style {
 
 // model
 
+type deleted struct {
+	branch branch
+	sha    string
+	index  int
+}
+
 type model struct {
 	branches []branch
 	cursor   int
@@ -39,6 +45,7 @@ type model struct {
 	height   int
 	msg      string
 	msgErr   bool
+	undos    []deleted
 }
 
 func (m model) Init() tea.Cmd { return nil }
@@ -69,17 +76,43 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if len(m.branches) == 0 {
 				break
 			}
-			name := m.branches[m.cursor].name
-			if err := exec.Command("git", "branch", "-D", name).Run(); err != nil {
-				m.msg = fmt.Sprintf("cannot delete %s", name)
+			b := m.branches[m.cursor]
+			sha, err := git("rev-parse", b.name)
+			if err != nil {
+				m.msg = fmt.Sprintf("cannot resolve %s", b.name)
+				m.msgErr = true
+				break
+			}
+			if err := exec.Command("git", "branch", "-D", b.name).Run(); err != nil {
+				m.msg = fmt.Sprintf("cannot delete %s", b.name)
 				m.msgErr = true
 			} else {
-				m.msg = fmt.Sprintf("deleted %s", name)
+				m.undos = append(m.undos, deleted{branch: b, sha: sha, index: m.cursor})
+				m.msg = fmt.Sprintf("deleted %s", b.name)
 				m.msgErr = false
 				m.branches = append(m.branches[:m.cursor], m.branches[m.cursor+1:]...)
 				if m.cursor >= len(m.branches) && m.cursor > 0 {
 					m.cursor--
 				}
+			}
+		case 'u':
+			if len(m.undos) == 0 {
+				break
+			}
+			last := m.undos[len(m.undos)-1]
+			if err := exec.Command("git", "branch", last.branch.name, last.sha).Run(); err != nil {
+				m.msg = fmt.Sprintf("cannot restore %s", last.branch.name)
+				m.msgErr = true
+			} else {
+				m.undos = m.undos[:len(m.undos)-1]
+				idx := last.index
+				if idx > len(m.branches) {
+					idx = len(m.branches)
+				}
+				m.branches = append(m.branches[:idx], append([]branch{last.branch}, m.branches[idx:]...)...)
+				m.cursor = idx
+				m.msg = fmt.Sprintf("restored %s", last.branch.name)
+				m.msgErr = false
 			}
 		}
 	}
@@ -189,7 +222,7 @@ func (m model) View() tea.View {
 		}
 	}
 
-	out.WriteString(dimSt.Render("  d: delete · ↑↓: navigate · q: quit") + "\n")
+	out.WriteString(dimSt.Render("  d: delete · u: undo · ↑↓: navigate · q: quit") + "\n")
 
 	return tea.NewView(out.String())
 }
