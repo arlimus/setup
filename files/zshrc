@@ -105,7 +105,6 @@ systemctl --user start app-org.fcitx.Fcitx5@autostart.service
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export XMODIFIERS=@im=fcitx
-
 export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket"
 
 export GOPATH=/pub/go
@@ -115,6 +114,7 @@ PATH=/pub/go/bin:$PATH
 alias b="bundle exec"
 alias ya="yt-dlp -f bestaudio --audio-quality 0 -i -x --extract-audio --no-playlist"
 alias yav="yt-dlp -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv --no-playlist"
+alias ys="yt-dlp --skip-download --write-subs --write-auto-subs --sub-lang en --convert-subs srt "
 alias y="yay --color auto"
 alias findlarge="find . -type f -exec du -h {} + | sort -h"
 alias yaml2json="python3 -c 'import sys; import yaml; import json; json.dump(yaml.safe_load(sys.stdin.read(-1)), sys.stdout)'"
