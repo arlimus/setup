@@ -133,4 +133,4 @@ alias btoff="rfkill block bluetooth"
 # add: ... && bluetoothctl connect AA:BB:CC:DD:EE:FF  <= your device
 alias bton="rfkill unblock bluetooth && sleep 1"
 
-alias ghpr='gh pr create --title "$(git log main..HEAD --reverse --format=%s | head -1)" --body ""'
+alias ghpr='gh pr create --title "$(git log origin/main..HEAD --reverse --format=%s | head -1)" --body ""'
