@@ -28,6 +28,7 @@ var commitTypes = []commitType{
 	{"🏇", "speed / race condition (horse)"},
 	{"🛑", "breaking feature (stop)"},
 	{"🟢", "get tests green"},
+	{"🍫", "examples (choco)"},
 }
 
 const (
