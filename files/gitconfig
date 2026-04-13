@@ -33,14 +33,13 @@ a  = add --all
 ap = add -p
 au = add --update
 
-pot = !git push -u origin $(git rev-parse --abbrev-ref HEAD)
-
 b  = branch
 ba = branch -a
 
 bi = bisect
 cl = clone
 co = checkout
+cob = checkout -b
 com = !git checkout "$(git rev-list HEAD --max-count 1)" && git branch -d main && git checkout main
 corm = !git checkout $1 && git rebase origin/main
 cofm = !git fetch --all --prune && git checkout $1 && git rebase origin/main
@@ -58,7 +57,6 @@ feb = !REFI="$(echo $1)" && PULL_ID="$(echo $REFI | sed 's_.*/__' | tr -d '[[:sp
 
 c     = commit -s
 cc    = commit --amend
-cm    = commit -m
 ca    = commit -a -s
 cam   = commit -a -s -m
 cp    = commit -s -p
@@ -92,6 +90,9 @@ pa = push --all
 pt = push --tags
 po = push -u origin
 pu = push -u origin --force-with-lease
+
+pot = !git push -u origin $(git rev-parse --abbrev-ref HEAD)
+put = !git push -u origin --force-with-lease $(git rev-parse --abbrev-ref HEAD)
 
 pl = pull
 pla= pull --all
@@ -164,3 +165,7 @@ file-view-vpane-position = 530
 	helper = !/usr/bin/gh auth git-credential
 [gpg]
 	format = ssh
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
