@@ -82,6 +82,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 		return m, nil
 
+	case tea.PasteMsg:
+		// Bubbletea v2 delivers bracketed-paste as PasteMsg (not KeyPressMsg).
+		// Forward to the focused widget so paste into title/body works.
+		switch m.field {
+		case fieldTitle:
+			var cmd tea.Cmd
+			m.title, cmd = m.title.Update(msg)
+			return m, cmd
+		case fieldBody:
+			var cmd tea.Cmd
+			m.body, cmd = m.body.Update(msg)
+			return m, cmd
+		}
+		return m, nil
+
 	case tea.KeyPressMsg:
 		key := msg.Key()
 		if key.Code == 'c' && key.Mod.Contains(tea.ModCtrl) {
