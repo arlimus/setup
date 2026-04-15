@@ -112,6 +112,7 @@ rho= !git reset --hard origin/"$(git rev-parse --abbrev-ref HEAD)"
 s  = status --short
 ss = status
 sw = !BRANCH="$1" && git switch origin/"$BRANCH" -C
+swpr = !PR="$1" && BRANCH=$(gh pr view "$PR" --json headRefName -q .headRefName) && git fetch origin "$BRANCH" && git switch origin/"$BRANCH" -C
 
 sac = !git stash apply && git stash clear
 
