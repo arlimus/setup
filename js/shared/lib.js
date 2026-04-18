@@ -166,12 +166,6 @@ export const installOsxBase = () => {
 const resolution = '1920x1200'
 export const installArchBoot = () => {
   packages(
-    // ui basics
-    'xorg', 'lightdm', 'mesa-libgl', 'lightdm-slick-greeter', 'lightdm-settings',
-    'gnome-keyring', 'arc-gtk-theme',
-    // i3
-    'i3', 'xfce4-terminal', 'picom', 'rofi', 'rofimoji', 'xdotool', 'dunst',
-    'gnome-settings-daemon', 'feh', 'udiskie', 'android-tools', 'dmidecode',
     // filesystems
     'btrfs-progs',
     // networking
@@ -188,22 +182,7 @@ export const installArchBoot = () => {
   //
   // 'networkmanager', 'network-manager-applet', 'networkmanager-iwd',
 
-  const configureLightdm = () => {
-    const p = '/etc/lightdm/lightdm.conf'
-    let c = fs.readFileSync(p, 'utf-8')
-    c = c.replace(/^#?greeter-session=.*/m, 'greeter-session=lightdm-slick-greeter')
-    syncFiles('xrandr.resize', '/usr/local/bin/xrandr.resize')
-    c = c.replace(/^#?display-setup-script=.*/m, `display-setup-script=xrandr.resize`)
-    c = c.replace(/^#?user-session=.*/m, `user-session=i3`)
-    fs.writeFileSync('/tmp/lightdmconf', c)
-    run(`sudo mv /tmp/lightdmconf ${p}`)
-  }
-  install('configure lightdm', false, configureLightdm)
-  run('sudo systemctl enable lightdm')
-
   run('sudo ln -sf /usr/lib/systemd/scripts/ /etc/init.d')
-  run('sudo touch /etc/X11/xorg.conf')
-
   syncFiles('inco.desktop', '/usr/share/applications/inco.desktop')
 }
 
@@ -234,6 +213,8 @@ export const installContainerRuntime = (username) => {
   run('systemctl --user start docker.service')
 }
 
+const useWayland = true
+
 // Arch core
 export const installArchCore = () => {
   const installYay = () => {
@@ -242,6 +223,52 @@ export const installArchCore = () => {
     run("sudo -u builduser bash -c 'git clone https://aur.archlinux.org/yay.git /tmp/yay && cd /tmp/yay && makepkg -si --noconfirm'")
   }
   install('yay', () => fs.existsSync('/usr/bin/yay'), installYay)
+
+  if(useWayland) {
+    packages(
+      'sway', 'swaybg', 'swayidle', 'swaylock', 'swaync', // or mako
+      'xdg-desktop-portal-gtk', 'xdg-desktop-portal-gnome', // file picker etc
+    )
+
+    const configureSway = () => syncFiles('sway.config', path.join(os.homedir(), '.config/sway/config'))
+    install('sway-config', false, configureSway)
+
+  } else {
+    packages(
+      'xorg', 'lightdm', 'lightdm-slick-greeter', 'lightdm-settings',
+      'i3', 'picom', 'feh', 'dunst',
+    )
+
+    // i3
+    const configureI3 = () => syncFiles('i3.config', path.join(os.homedir(), '.config/i3/config'))
+    install('i3-config', false, configureI3)
+
+    // picom
+    const configurePicom = () => syncFiles('picom.conf', path.join(os.homedir(), '.config/picom.conf'))
+    install('picom conf', false, configurePicom)
+
+    const configureLightdm = () => {
+    const p = '/etc/lightdm/lightdm.conf'
+    let c = fs.readFileSync(p, 'utf-8')
+    c = c.replace(/^#?greeter-session=.*/m, 'greeter-session=lightdm-slick-greeter')
+    syncFiles('xrandr.resize', '/usr/local/bin/xrandr.resize')
+    c = c.replace(/^#?display-setup-script=.*/m, `display-setup-script=xrandr.resize`)
+    c = c.replace(/^#?user-session=.*/m, `user-session=i3`)
+    fs.writeFileSync('/tmp/lightdmconf', c)
+      run(`sudo mv /tmp/lightdmconf ${p}`)
+    }
+    install('configure lightdm', false, configureLightdm)
+    run('sudo systemctl enable lightdm')
+    run('sudo touch /etc/X11/xorg.conf')
+  }
+
+  packages(
+    // ui basics
+    'mesa-libgl', 'gnome-keyring', 'arc-gtk-theme',
+    'xfce4-terminal', // or alacritty
+    'rofi', 'rofimoji', 'xdotool', 'dunst',
+    'gnome-settings-daemon', 'udiskie', 'android-tools', 'dmidecode',
+  )
 
   packages(
     // basics
@@ -263,7 +290,8 @@ export const installArchCore = () => {
     // video-tools
     'inotify-tools', 'yt-dlp', 'x265', 'mpv', 'alsa-utils',
     'mkvtoolnix-cli', 'ffmpeg',
-    'vorbis-tools', 'opus-tools', 'advcpmv', 'obs-studio',
+    'vorbis-tools', 'opus-tools', 'advcpmv',
+    'obs-studio', 'wlrobs', // wlrobs = obs plugin for wayland
     // fonts
     'noto-fonts', 'noto-fonts-emoji', 'noto-fonts-extra', 'noto-fonts-cjk',
     // web
@@ -345,20 +373,12 @@ export const installCore = () => {
   install('~/Screenshots', () => fs.existsSync(screenspath), () => run(`mkdir ${screenspath}`))
   run('gsettings set org.gnome.gnome-screenshot auto-save-directory "file:///home/$USER/Screenshots/"')
 
-  // i3
-  const configureI3 = () => syncFiles('i3.config', path.join(os.homedir(), '.config/i3/config'))
-  install('i3-config', false, configureI3)
-
   // rofi
   const configureRofi = () => {
     syncFiles('rofi/config.rasi', path.join(os.homedir(), '.config/rofi/config.rasi'))
     syncFiles('rofi/zero.rasi', path.join(os.homedir(), '.config/rofi/zero.rasi'))
   }
   install('rofi-config', false, configureRofi)
-
-  // picom
-  const configurePicom = () => syncFiles('picom.conf', path.join(os.homedir(), '.config/picom.conf'))
-  install('picom conf', false, configurePicom)
 
   // terminal
   const configureTerm = () => syncFiles('xfce4terminal.rc', path.join(os.homedir(), '.config/xfce4/terminal/terminalrc'))
