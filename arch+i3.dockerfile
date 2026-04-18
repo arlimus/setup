@@ -9,7 +9,7 @@ RUN pacman -S --noconfirm \
     i3-wm \
     nodejs \
     ttf-dejavu \
-    xfce4-terminal \
+    kitty \
     yarn
 
 ADD . / /install/

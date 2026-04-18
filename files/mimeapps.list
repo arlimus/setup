@@ -1,0 +1,34 @@
+[Default Applications]
+application/x-gnome-saved-search=dde-file-manager.desktop
+image/webp=firefox.desktop
+text/html=firefox.desktop
+application/rss+xml=firefox.desktop
+application/rdf+xml=firefox.desktop
+x-scheme-handler/http=firefox.desktop
+x-scheme-handler/https=firefox.desktop
+x-scheme-handler/ftp=firefox.desktop
+x-scheme-handler/chrome=firefox.desktop
+video/webm=firefox.desktop
+x-scheme-handler/msteams=teams.desktop
+x-scheme-handler/tg=org.telegram.desktop.desktop
+x-scheme-handler/figma=figma-linux.desktop
+x-scheme-handler/tonsite=org.telegram.desktop.desktop
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop
+x-scheme-handler/slack=slack.desktop
+inode/directory=yazi.desktop
+
+[Added Associations]
+application/x-gnome-saved-search=dde-file-manager.desktop;
+image/webp=firefox.desktop;
+text/html=firefox.desktop;
+application/rss+xml=firefox.desktop;
+application/rdf+xml=firefox.desktop;
+x-scheme-handler/http=firefox.desktop;
+x-scheme-handler/https=firefox.desktop;
+x-scheme-handler/ftp=firefox.desktop;
+x-scheme-handler/chrome=firefox.desktop;
+video/webm=firefox.desktop;
+application/zip=org.gnome.gThumb.desktop;
+x-scheme-handler/tg=userapp-Telegram Desktop-8CL1V0.desktop;org.telegram.desktop.desktop;
+application/pdf=firefox.desktop;
+x-scheme-handler/tonsite=org.telegram.desktop.desktop;

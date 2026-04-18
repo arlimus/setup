@@ -227,7 +227,8 @@ export const installArchCore = () => {
   if(useWayland) {
     packages(
       'sway', 'swaybg', 'swayidle', 'swaylock', 'swaync', // or mako
-      'xdg-desktop-portal-gtk', 'xdg-desktop-portal-gnome', // file picker etc
+      'aur/xdg-desktop-portal-termfilechooser', // file-picker using yazi; can also do gtk/gnome
+      'xwayland-satellite',
     )
 
     const configureSway = () => syncFiles('sway.config', path.join(os.homedir(), '.config/sway/config'))
@@ -265,14 +266,15 @@ export const installArchCore = () => {
   packages(
     // ui basics
     'mesa-libgl', 'gnome-keyring', 'arc-gtk-theme',
-    'xfce4-terminal', // or alacritty
+    'kitty', // or alacritty; kitty has a nice image protocol, works with yazi
+    'yazi', // terminal file picker with preview
     'rofi', 'rofimoji', 'xdotool', 'dunst',
     'gnome-settings-daemon', 'udiskie', 'android-tools', 'dmidecode',
   )
 
   packages(
     // basics
-    'git', 'diff-so-fancy', 'curl', 'htop', 'p7zip', 'encfs', 'pwgen',
+    'git', 'just', 'diff-so-fancy', 'curl', 'htop', 'p7zip', 'encfs', 'pwgen',
     'openssh', 'sshfs', 'tree', 'net-tools', 'termdown', 'gdu', 'renameutils',
     'rclone', 'claude-code', 'openai-codex', 'github-cli',
     // deps for dev
@@ -316,6 +318,8 @@ export const installArchCore = () => {
   install('ylater', () => fs.existsSync('/usr/local/bin/ylater'), () => syncFiles('ylater.sh', '/usr/local/bin/ylater'))
   install('ylaterw', () => fs.existsSync('/usr/local/bin/ylaterw'), () => syncFiles('ylaterw.sh', '/usr/local/bin/ylaterw'))
   install('ylaterhq', () => fs.existsSync('/usr/local/bin/ylaterhq'), () => syncFiles('ylaterhq.sh', '/usr/local/bin/ylaterhq'))
+
+  syncFiles('mimeapps.list', path.join(os.homedir(), '.config/mimeapps.list'))
 }
 
 export const configureZsh = () => {
@@ -379,10 +383,6 @@ export const installCore = () => {
     syncFiles('rofi/zero.rasi', path.join(os.homedir(), '.config/rofi/zero.rasi'))
   }
   install('rofi-config', false, configureRofi)
-
-  // terminal
-  const configureTerm = () => syncFiles('xfce4terminal.rc', path.join(os.homedir(), '.config/xfce4/terminal/terminalrc'))
-  install('xfce4-terminal', false, configureTerm)
 
   // international input
   packages('fcitx5', 'fcitx5-configtool', 'fcitx5-qt', 'fcitx5-gtk', 'fcitx5-mozc', 'fcitx5-hangul')
