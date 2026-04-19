@@ -320,6 +320,7 @@ export const installArchCore = () => {
   install('ylaterhq', () => fs.existsSync('/usr/local/bin/ylaterhq'), () => syncFiles('ylaterhq.sh', '/usr/local/bin/ylaterhq'))
 
   syncFiles('mimeapps.list', path.join(os.homedir(), '.config/mimeapps.list'))
+  syncFiles('kitty.conf', path.join(os.homedir(), '.config/kitty/kitty.conf'))
   syncFiles('kitty.no-preference-theme.auto.conf', path.join(os.homedir(), '.config/kitty/no-preference-theme.auto.conf'))
 }
 
