@@ -388,8 +388,12 @@ export const installCore = () => {
 
   // international input
   packages('fcitx5', 'fcitx5-configtool', 'fcitx5-qt', 'fcitx5-gtk', 'fcitx5-mozc', 'fcitx5-hangul')
-  // TODO: users must enable it via:
-  // systemctl --user enable app-org.fcitx.Fcitx5@autostart.service
+  // fcitx5 autostart is wired via `exec fcitx5 -d --replace` in sway.config so it
+  // inherits WAYLAND_DISPLAY — required for native-Wayland apps (kitty, Electron)
+  // to reach fcitx5 via the input-method-v2 protocol. GTK/Qt apps go over DBus
+  // and work regardless, but text-input-v3 clients do not.
+  // VSCode/Electron also needs explicit flags to use text-input-v3:
+  syncFile('code-flags.conf', path.join(os.homedir(), '.config/code-flags.conf'))
 
   // zero tools
   const toolsHome = path.join(os.homedir(), '.zero.tools')
