@@ -229,6 +229,8 @@ export const installArchCore = () => {
       'sway', 'swaybg', 'swayidle', 'swaylock', 'swaync', // or mako
       'aur/xdg-desktop-portal-termfilechooser', // file-picker using yazi; can also do gtk/gnome
       'xwayland-satellite',
+      // helpers
+      'grim', 'slurp', 'wl-clipboard',
     )
 
     const configureSway = () => syncFiles('sway.config', path.join(os.homedir(), '.config/sway/config'))
@@ -238,6 +240,8 @@ export const installArchCore = () => {
     packages(
       'xorg', 'lightdm', 'lightdm-slick-greeter', 'lightdm-settings',
       'i3', 'picom', 'feh', 'dunst',
+      // helpers
+      'xclip', 'maim',
     )
 
     // i3
@@ -285,7 +289,7 @@ export const installArchCore = () => {
     'the_silver_searcher', 'jq', 'yq', 'ttf-inconsolata',
     'bat', 'fzf', 'ripgrep',
     // productivity
-    'go', 'imagemagick', 'graphicsmagick', 'maim', 'xclip',
+    'go', 'imagemagick', 'graphicsmagick',
     'code', 'meld', 'colordiff', 'httpie', 'protobuf', 'rsync',
     // audio config
     'pipewire', 'pavucontrol', 'rtkit', 'realtime-privileges',
