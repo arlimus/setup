@@ -326,6 +326,8 @@ export const installArchCore = () => {
   syncFiles('mimeapps.list', path.join(os.homedir(), '.config/mimeapps.list'))
   syncFiles('kitty.conf', path.join(os.homedir(), '.config/kitty/kitty.conf'))
   syncFiles('kitty.no-preference-theme.auto.conf', path.join(os.homedir(), '.config/kitty/no-preference-theme.auto.conf'))
+
+  syncFiles('obstoggle', '/usr/local/bin/obstoggle')
 }
 
 export const configureZsh = () => {
