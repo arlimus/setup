@@ -66,23 +66,47 @@ const installCmd = (what, test = null) =>
   (test == null) ? installCmd(what, () => commandExists(what)) :
   (typeof test === 'string') ? installCmd(what, () => commandExists(test)) :
   install(what, test, () => packages(what))
+// Chain returned by syncFile/syncFiles. `.changed(fn)` runs fn only if the
+// destination actually differed from the source (or the sync failed to verify).
+const noopChain = { changed: () => noopChain }
+const syncChain = (didChange) => {
+  const c = { changed: fn => { if(didChange) fn(); return c } }
+  return c
+}
+const safeRead = p => { try { return fs.readFileSync(p) } catch(e) { return null } }
+
 const syncFile = (src, dst) => {
   const srcp = path.join('files', src);
-  if(!fs.existsSync(srcp))
-    return print.err(`Cannot find source file in ${srcp}`)
+  if(!fs.existsSync(srcp)) {
+    print.err(`Cannot find source file in ${srcp}`)
+    return noopChain
+  }
   console.log(`${srcp} -> ${dst}`)
-  return shell.cp(srcp, dst)
+  const before = safeRead(dst)
+  const r = shell.cp(srcp, dst)
+  if(r.code !== 0) return noopChain
+  const after = safeRead(dst)
+  return syncChain(before == null || after == null || !before.equals(after))
 }
 const syncFiles = (src, dst) => {
   const srcp = path.join('files', src);
-  if(!fs.existsSync(srcp))
-    return print.err(`Cannot find source file in ${srcp}`)
+  if(!fs.existsSync(srcp)) {
+    print.err(`Cannot find source file in ${srcp}`)
+    return noopChain
+  }
   console.log(`${srcp} -> ${dst}`)
   shell.mkdir('-p', path.dirname(dst))
+  const srcIsFile = fs.statSync(srcp).isFile()
+  const before = srcIsFile ? safeRead(dst) : null
+  let ok
   if(dst.startsWith(os.homedir()))
-    return shell.cp('-R', srcp, dst)
+    ok = shell.cp('-R', srcp, dst).code === 0
   else
-    return run(`sudo cp ${srcp} ${dst}`)
+    ok = run(`sudo cp ${srcp} ${dst}`).code === 0
+  if(!ok) return noopChain
+  if(!srcIsFile) return syncChain(true) // dir copies: assume changed
+  const after = safeRead(dst)
+  return syncChain(before == null || after == null || !before.equals(after))
 }
 
 const writeFile = (path, content) => {
@@ -326,6 +350,10 @@ export const installArchCore = () => {
   syncFiles('mimeapps.list', path.join(os.homedir(), '.config/mimeapps.list'))
   syncFiles('kitty.conf', path.join(os.homedir(), '.config/kitty/kitty.conf'))
   syncFiles('kitty.no-preference-theme.auto.conf', path.join(os.homedir(), '.config/kitty/no-preference-theme.auto.conf'))
+
+  // fontconfig: force JP glyphs for shared CJK kanji in untagged apps
+  syncFiles('69-language-selector-ja.conf', path.join(os.homedir(), '.config/fontconfig/conf.d/69-language-selector-ja.conf'))
+    .changed(() => run('fc-cache -fr'))
 
   syncFiles('obstoggle', '/usr/local/bin/obstoggle')
 }
