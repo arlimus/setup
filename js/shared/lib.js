@@ -251,6 +251,7 @@ export const installArchCore = () => {
   if(useWayland) {
     packages(
       'sway', 'swaybg', 'swayidle', 'swaylock', 'swaync', // or mako
+      'xdg-desktop-portal', 'xdg-desktop-portal-wlr', 'xdg-desktop-portal-gtk', // screen-share/screenshot/file-picker
       'aur/xdg-desktop-portal-termfilechooser', // file-picker using yazi; can also do gtk/gnome
       'xwayland-satellite',
       // helpers
@@ -259,6 +260,14 @@ export const installArchCore = () => {
 
     const configureSway = () => syncFiles('sway.config', path.join(os.homedir(), '.config/sway/config'))
     install('sway-config', false, configureSway)
+
+    // xdg-desktop-portal: route ScreenCast/Screenshot to wlr backend, with slurp as the output picker.
+    // Requires sway.config to export WAYLAND_DISPLAY to systemd via dbus-update-activation-environment.
+    const configurePortals = () => {
+      syncFiles('xdg-desktop-portal.sway-portals.conf', path.join(os.homedir(), '.config/xdg-desktop-portal/sway-portals.conf'))
+      syncFiles('xdg-desktop-portal-wlr.config', path.join(os.homedir(), '.config/xdg-desktop-portal-wlr/config'))
+    }
+    install('xdg-desktop-portal-config', false, configurePortals)
 
   } else {
     packages(
