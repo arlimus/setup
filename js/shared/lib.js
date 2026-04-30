@@ -317,7 +317,7 @@ export const installArchCore = () => {
     // deps for dev
     'base-devel', 'pnpm', 'python-pip',
     // editor
-    'vim', 'neovim', 'vim-surround',
+    'vim', 'neovim', 'vim-surround', 'glow',
     // cli tools
     'the_silver_searcher', 'jq', 'yq', 'ttf-inconsolata',
     'bat', 'fzf', 'ripgrep',
