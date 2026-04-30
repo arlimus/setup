@@ -7,13 +7,28 @@
 #   fetch.sh <url> [--refresh] [--with-comments]
 #
 # stdout: structured block — CACHE_DIR, METADATA, CHAPTERS, DESCRIPTION,
-#         TOP_COMMENTS (if --with-comments), TRANSCRIPT_FILE
+#         TOP_COMMENTS (if --with-comments), TRANSCRIPT_FILE, SUMMARY_PATH
 # stderr: progress + errors
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CACHE_ROOT="$HOME/.cache/claude-youtube-summary"
+SUMMARY_ROOT="$HOME/.cache/youtube-summaries"
+
+# Make the title safe to use as a filename: drop control chars, collapse
+# anything outside [A-Za-z0-9._-] into "_", trim leading/trailing "_.-",
+# cap length, fall back to "untitled" if nothing usable remains.
+sanitize_title() {
+  local t
+  t=$(LC_ALL=C printf '%s' "$1" \
+        | tr -d '\000-\037\177' \
+        | sed -E 's/[^A-Za-z0-9._-]+/_/g; s/_+/_/g; s/^[_.-]+//; s/[_.-]+$//' \
+        | cut -c1-80 \
+        | sed -E 's/[_.-]+$//')
+  [ -n "$t" ] || t="untitled"
+  printf '%s' "$t"
+}
 
 URL=""
 REFRESH=0
@@ -119,3 +134,9 @@ if [ -n "$RAW_VTT" ]; then
 else
   echo "(no subtitles available — work from description + chapters only)"
 fi
+echo
+echo "### SUMMARY_PATH"
+mkdir -p "$SUMMARY_ROOT"
+TITLE_RAW=$(jq -r '.title // ""' "$INFO")
+SAFE_TITLE=$(sanitize_title "$TITLE_RAW")
+echo "$SUMMARY_ROOT/$SAFE_TITLE.$VIDEO_ID.txt"
