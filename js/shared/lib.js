@@ -532,6 +532,26 @@ export const installDevEnv = (name, email) => {
     'typescript-lsp@claude-plugins-official',
   )
 
+  // Claude Code skills (after claude-code is installed so ~/.claude/skills is the right place)
+  // Installer is source-of-truth: dst is wiped before copy so re-runs converge on files/skills/<name>.
+  const claudeSkillsDir = path.join(os.homedir(), '.claude/skills')
+  const installClaudeSkill = (name) => {
+    const src = path.join('files/skills', name)
+    const dst = path.join(claudeSkillsDir, name)
+    shell.mkdir('-p', claudeSkillsDir)
+    shell.rm('-rf', dst)
+    if(shell.cp('-Rf', src, dst).code !== 0) {
+      print.err(`Failed to install claude skill: ${name}`)
+      return
+    }
+    // Restore +x on any shell scripts in case git lost the bit
+    shell.find(dst)
+      .filter(f => f.endsWith('.sh'))
+      .forEach(f => shell.chmod('+x', f))
+    print.ok(`claude skill: ${name}`)
+  }
+  installClaudeSkill('youtube-summary')
+
   ensureJson(path.join(os.homedir(), '.config/Code - OSS/User/settings.json'),
     {
       "go.formatTool": "goimports",
