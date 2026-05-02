@@ -47,7 +47,7 @@ The script writes structured output to stdout in this exact order:
 - `### DESCRIPTION` — full uploader description
 - `### TOP_COMMENTS` — only if `--with-comments` was passed
 - `### TRANSCRIPT_FILE` — absolute path to the cleaned `[mm:ss]` transcript, plus a line count. If captions are unavailable: `(no subtitles available — work from description + chapters only)`
-- `### SUMMARY_PATH` — absolute path under `~/.cache/youtube-summaries/` where you must write the synthesized summary in Step 4. Format: `<sanitized-title>.<video-id>.txt`
+- `### SUMMARY_PATH` — absolute path under `~/.cache/youtube-summaries/` where you must write the synthesized summary in Step 4. Format: `<sanitized-title>.<video-id>.md`
 
 If the script exits non-zero (private / age-locked / region-blocked / deleted), report the error verbatim and stop.
 
@@ -116,7 +116,7 @@ The cache persists across sessions, so re-reads are free.
 ## Cache management
 
 - Transcript / metadata cache: `~/.cache/claude-youtube-summary/<video-id>/`
-- Saved summaries: `~/.cache/youtube-summaries/<sanitized-title>.<video-id>.txt`
+- Saved summaries: `~/.cache/youtube-summaries/<sanitized-title>.<video-id>.md`
 - Force refresh a single video: pass `--refresh` (rebuilds metadata; the summary file gets overwritten on the next run regardless)
 - Wipe everything: `rm -rf ~/.cache/claude-youtube-summary ~/.cache/youtube-summaries`
 

@@ -1,30 +1,30 @@
 alias v="mpv -vo x11 "
 alias b="bundle exec"
-alias ya="youtube-dl --no-playlist -f bestaudio --audio-quality 0 -i -x --extract-audio"
-alias yav="youtube-dl --no-playlist -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"
-alias yavs="youtube-dl --no-playlist --sub-lang en --write-auto-sub --embed-sub "
-alias yapl="youtube-dl -f bestaudio --audio-quality 0 -i -x --extract-audio"
-alias yavpl="youtube-dl -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"
-alias yt="youtube-dl -f 18 -i"
+alias ya="yt-dlp --no-playlist -f bestaudio --audio-quality 0 -i -x --extract-audio"
+alias yav="yt-dlp --no-playlist -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"
+alias yavs="yt-dlp --no-playlist --sub-lang en --write-auto-sub --embed-sub "
+alias yapl="yt-dlp -f bestaudio --audio-quality 0 -i -x --extract-audio"
+alias yavpl="yt-dlp -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"
+alias yt="yt-dlp -f 18 -i"
 export GOPATH=/pub/go
 PATH=/pub/go/bin:$PATH
 export $(gnome-keyring-daemon -s)
 
 alias em="echo \" 🎉 🛑 🐛 💫 🍏 ➖ 💩 ⭐ 🌟 🐎 \n 🌌 🌙 🎨 🎫 🦅 📦 🐳 🚀 🛸 🌠 \n 👍 👎 🥳 🤬 🤪 🥵 🥶 🤯 🤘 🤞 \n 📯 🌊 🎆 🎇 🔥 💎\""
 
-alias ya="youtube-dl -f bestaudio --audio-quality 0 -i -x --extract-audio"
-alias yav="youtube-dl -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"
+alias ya="yt-dlp -f bestaudio --audio-quality 0 -i -x --extract-audio"
+alias yav="yt-dlp -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"
 alias y="yay --color auto"
 ylater() {
   url="$1"
   test -z "$url" && echo "need a youtube link" && exit 1
-  f="$(youtube-dl --get-filename "$url")"
+  f="$(yt-dlp --get-filename "$url")"
   d="$(date +"%m-%d")"
   echo "Download \e[35m$url\e[0m to\n\e[36m$f\e[0m"
   #read -s -n 1 key
   mkdir -p ~/4serv/"$d"
   cd ~/4serv/"$d"
-  youtube-dl -f 18 "$url"
+  yt-dlp -f 18 "$url"
   #echo "$url" > "$f".url
 }
 

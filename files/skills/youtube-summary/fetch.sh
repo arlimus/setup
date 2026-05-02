@@ -139,4 +139,4 @@ echo "### SUMMARY_PATH"
 mkdir -p "$SUMMARY_ROOT"
 TITLE_RAW=$(jq -r '.title // ""' "$INFO")
 SAFE_TITLE=$(sanitize_title "$TITLE_RAW")
-echo "$SUMMARY_ROOT/$SAFE_TITLE.$VIDEO_ID.txt"
+echo "$SUMMARY_ROOT/$SAFE_TITLE.$VIDEO_ID.md"
