@@ -397,7 +397,6 @@ export const configureZsh = () => {
   ensure('PATH=/pub/go/bin:$PATH')
   ensure('alias b="bundle exec"')
   ensure('alias ya="yt-dlp -f bestaudio --audio-quality 0 -i -x --extract-audio"')
-  ensure('alias yav="yt-dlp -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv"')
   ensure('alias y="yay --color auto"')
   ensure('alias findlarge="find . -type f -exec du -h {} + | sort -h"')
   ensure("alias yaml2json=\"python3 -c 'import sys; import yaml; import json; json.dump(yaml.safe_load(sys.stdin.read(-1)), sys.stdout)'\"")
@@ -447,6 +446,7 @@ export const installCore = () => {
     // and install
     'sudo ln -s $(pwd)/normalize.names.js /usr/local/bin/normalize.names',
     'sudo ln -s $(pwd)/mextract.py /usr/local/bin/mextract',
+    'sudo ln -s $(pwd)/yav.sh /usr/local/bin/yav',
   ].join(' && '))
 }
 
