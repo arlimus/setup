@@ -154,6 +154,31 @@ const inObject = (item, obj) => {
   return !notEq;
 }
 
+// Merge entries into permissions.allow in ~/.claude/settings.json without
+// touching unrelated keys. Idempotent: re-running adds nothing if the entries
+// already exist verbatim.
+const ensureClaudePermissions = (allowEntries) => {
+  const p = path.join(os.homedir(), '.claude/settings.json')
+  const c = readFile(p, '{}')
+  let org
+  try { org = JSON.parse(c) } catch(err) {
+    print.err(`Failed to parse ${p}: ${err}`)
+    return
+  }
+  if(!org.permissions) org.permissions = {}
+  if(!Array.isArray(org.permissions.allow)) org.permissions.allow = []
+  let changed = false
+  allowEntries.forEach(e => {
+    if(!org.permissions.allow.includes(e)) {
+      org.permissions.allow.push(e)
+      print.add(`    > ${p}: + ${e}`)
+      changed = true
+    }
+  })
+  if(changed) writeFile(p, JSON.stringify(org, null, 2) + "\n")
+  print.ok(`claude permissions in ${p}`)
+}
+
 const ensureJson = (path, j) => {
   try {
     c = readFile(path, '')
@@ -551,6 +576,13 @@ export const installDevEnv = (name, email) => {
     print.ok(`claude skill: ${name}`)
   }
   installClaudeSkill('youtube-summary')
+
+  // Permissions the youtube-summary skill needs (read its cache, save summaries).
+  const home = os.homedir()
+  ensureClaudePermissions([
+    `Read(${home}/.cache/claude-youtube-summary/**)`,
+    `Write(${home}/.cache/youtube-summaries/**)`,
+  ])
 
   ensureJson(path.join(os.homedir(), '.config/Code - OSS/User/settings.json'),
     {
