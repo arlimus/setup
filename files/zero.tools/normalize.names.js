@@ -11,6 +11,64 @@ const Config = {
   exceptions: {"_ocr": true},
 };
 
+// Files with these extensions should never be executable. We chmod them to
+// 0o644 if they currently have any exec bit set.
+const NORMAL_EXTENSIONS = new Set([
+  // images
+  'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'tif', 'webp', 'heic', 'heif',
+  'svg', 'ico', 'avif', 'raw', 'cr2', 'nef', 'dng', 'psd',
+  // video
+  'mkv', 'mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mpg', 'mpeg', 'm4v',
+  '3gp', 'ts', 'mts', 'm2ts', 'vob', 'ogv',
+  // audio
+  'mp3', 'ogg', 'opus', 'wav', 'flac', 'aac', 'm4a', 'wma', 'aiff', 'ape',
+  'mid', 'midi',
+  // documents
+  'pdf', 'doc', 'docx', 'odt', 'rtf', 'txt', 'md', 'epub', 'mobi',
+  'azw', 'azw3', 'djvu',
+  // spreadsheets / presentations
+  'xls', 'xlsx', 'ods', 'csv', 'tsv', 'ppt', 'pptx', 'odp', 'key',
+  // archives
+  'zip', 'tar', 'gz', 'bz2', 'xz', '7z', 'rar', 'tgz', 'tbz', 'txz',
+  'lz', 'lzma', 'zst',
+  // subtitles
+  'srt', 'sub', 'idx', 'vtt', 'ass', 'ssa',
+  // data / config
+  'json', 'xml', 'yaml', 'yml', 'toml', 'ini', 'log', 'conf', 'cfg',
+]);
+
+const isNormalFile = (file) => {
+  if(!file.stat.isFile()) return false;
+  const ext = path.extname(file.path).slice(1).toLowerCase();
+  return NORMAL_EXTENSIONS.has(ext);
+};
+
+const hasExecBits = (mode) => (mode & 0o111) !== 0;
+
+// Per-device cache for whether the filesystem honors chmod. FAT/exFAT/NTFS
+// mounts often silently ignore chmod, so we probe once per device and skip.
+const fsPermsByDev = {};
+
+const tryChmod644 = (filepath, dev) => {
+  if(fsPermsByDev[dev] === false) return 'unsupported';
+  try {
+    fs.chmodSync(filepath, 0o644);
+    const newMode = fs.statSync(filepath).mode & 0o777;
+    if(newMode !== 0o644) {
+      if(fsPermsByDev[dev] === undefined) {
+        console.log(colors.yellow(`\nFilesystem on device ${dev} does not honor chmod; skipping further permission changes there.`))
+      }
+      fsPermsByDev[dev] = false;
+      return 'unsupported';
+    }
+    fsPermsByDev[dev] = true;
+    return 'ok';
+  } catch (e) {
+    fsPermsByDev[dev] = false;
+    return 'error';
+  }
+};
+
 const args = process.argv.slice(2);
 const files = [];
 
@@ -261,9 +319,6 @@ const normalizeFolderFiles = (folder, all, hooks) => {
 
     files.forEach(f => {
       hooks[f.path] = (name) => {
-        if(f.stat.isFile() && (f.stat.mode & 0o777) != (f.stat.mode & 0o644)) {
-          fs.chmodSync(f.path, 0o644)
-        }
         let nu = normalizeSequence(name, folderName, maxDigits)
         if(nu == null) return name
         return nu
@@ -364,20 +419,37 @@ console.log(colors.green(`Expanded files: ${_s(xfiles.length, 'xfiles')}`))
 var stats = { rename: [], unchanged: [] }
 xfiles.forEach(x => normName(x, hooks, false, stats))
 
+const chmodTargets = xfiles.filter(x => isNormalFile(x) && hasExecBits(x.stat.mode))
+
 printStats(stats)
-if(stats.rename.length === 0) {
-  console.log("Nothing to rename. We are done.")
+chmodTargets.forEach(x => {
+  console.log(`${colors.magenta('chmod 0644')}  ${path.basename(x.path)}  ${colors.gray('(' + (x.stat.mode & 0o777).toString(8) + ')')}`)
+})
+
+if(stats.rename.length === 0 && chmodTargets.length === 0) {
+  console.log("Nothing to rename or chmod. We are done.")
   process.exit(0)
 }
 
+const actions = []
+if(stats.rename.length > 0) actions.push(`rename ${stats.rename.length} files`)
+if(chmodTargets.length > 0) actions.push(`chmod ${chmodTargets.length} files to 0644`)
+
 inquirer.prompt({ type: 'confirm', name: 'rename',
-  message: `Do you want to rename these ${stats.rename.length} files? (${stats.unchanged.length} unchanged)`, default: false
+  message: `Do you want to ${actions.join(' and ')}? (${stats.unchanged.length} unchanged)`, default: false
 }).then(answers => {
   if(!answers.rename) {
     console.log("Aborting.")
     process.exit(0)
   }
+  // chmod first so we can use the original paths; renames happen next
+  chmodTargets.forEach(x => {
+    const res = tryChmod644(x.path, x.stat.dev)
+    if(res === 'ok') process.stdout.write(colors.magenta('p'))
+    else if(res === 'unsupported') process.stdout.write(colors.gray('p'))
+    else process.stdout.write(colors.red('p'))
+  })
   xfiles.forEach(x => normName(x, hooks, true))
-  console.log(colors.green("All done."))
+  console.log(colors.green("\nAll done."))
   process.exit(0)
 })
