@@ -280,7 +280,7 @@ export const installArchCore = () => {
       'aur/xdg-desktop-portal-termfilechooser', // file-picker using yazi; can also do gtk/gnome
       'xwayland-satellite',
       // helpers
-      'grim', 'slurp', 'wl-clipboard',
+      'grim', 'slurp', 'wl-clipboard', 'wtype',
     )
 
     const configureSway = () => syncFiles('sway.config', path.join(os.homedir(), '.config/sway/config'))
@@ -299,7 +299,7 @@ export const installArchCore = () => {
       'xorg', 'lightdm', 'lightdm-slick-greeter', 'lightdm-settings',
       'i3', 'picom', 'feh', 'dunst',
       // helpers
-      'xclip', 'maim',
+      'xclip', 'maim', 'xdotool',
     )
 
     // i3
@@ -330,7 +330,7 @@ export const installArchCore = () => {
     'mesa-libgl', 'gnome-keyring', 'arc-gtk-theme',
     'kitty', // or alacritty; kitty has a nice image protocol, works with yazi
     'yazi', // terminal file picker with preview
-    'rofi', 'rofimoji', 'xdotool', 'dunst',
+    'rofi', 'rofimoji', 'dunst',
     'gnome-settings-daemon', 'udiskie', 'android-tools', 'dmidecode',
   )
 
