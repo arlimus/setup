@@ -276,7 +276,15 @@ const normName = (x, hooks, apply, stats) => {
     if(stats != null) stats.unchanged.push(colors.gray(`${r} (unchanged)`))
   } else {
     if(apply) return rename(dir, bn, r)
-    if(stats != null) stats.rename.push(`${colors.blue(bn)}  -->  ${colors.cyan(r)}`)
+    if(stats != null) {
+      if(isNormalFile(x) && hasExecBits(x.stat.mode)) {
+        const oldMode = (x.stat.mode & 0o777).toString(8)
+        stats.rename.push(`${colors.blue(bn)} ${colors.gray('('+oldMode+')')}  -->  ${colors.cyan(r)} ${colors.gray('(644)')}`)
+        stats.chmodCombined.add(x.path)
+      } else {
+        stats.rename.push(`${colors.blue(bn)}  -->  ${colors.cyan(r)}`)
+      }
+    }
   }
 
   return r
@@ -416,14 +424,15 @@ var hooks = {}
 xfiles = expandFiles(files, hooks)
 console.log(colors.green(`Expanded files: ${_s(xfiles.length, 'xfiles')}`))
 
-var stats = { rename: [], unchanged: [] }
+var stats = { rename: [], unchanged: [], chmodCombined: new Set() }
 xfiles.forEach(x => normName(x, hooks, false, stats))
 
 const chmodTargets = xfiles.filter(x => isNormalFile(x) && hasExecBits(x.stat.mode))
 
 printStats(stats)
-chmodTargets.forEach(x => {
-  console.log(`${colors.magenta('chmod 0644')}  ${path.basename(x.path)}  ${colors.gray('(' + (x.stat.mode & 0o777).toString(8) + ')')}`)
+chmodTargets.filter(x => !stats.chmodCombined.has(x.path)).forEach(x => {
+  const oldMode = (x.stat.mode & 0o777).toString(8)
+  console.log(`${colors.cyan(path.basename(x.path))} (${colors.blue(oldMode)} --> ${colors.cyan('644')})`)
 })
 
 if(stats.rename.length === 0 && chmodTargets.length === 0) {
