@@ -1,4 +1,5 @@
 import * as setup from './shared/lib.js';
+import * as installer from './shared/installer.js';
 import { select, input, checkbox } from '@inquirer/prompts';
 import os from 'os';
 
@@ -72,32 +73,32 @@ if(o.email == '') {
 
 if(setup.isArch) {
   if(scope.includes(INSTALL_CORE)) {
-    setup.installArchBoot()
-    setup.installArchCore()
+    installer.installArchBoot()
+    installer.installArchCore()
   }
   if(scope.includes(INSTALL_CONTAINER)) {
-    setup.installContainerRuntime(username)
+    installer.installContainerRuntime(username)
   }
 }
 
 if(setup.isOsx) {
   if(scope.includes(INSTALL_CORE)) {
-    setup.installOsxBase()
+    installer.installOsxBase()
   }
 }
 
 if(scope.includes(INSTALL_ZSH)) {
-  setup.configureZsh()
+  installer.configureZsh()
 }
 
 if(scope.includes(INSTALL_DEV)) {
-  setup.installDevEnv(o.name, o.email)
+  installer.installDevEnv(o.name, o.email)
 }
 
 if(installMode == 'server') {
-  setup.installAsServer()
+  installer.installAsServer()
 }
 
 if(graphics == 'amd') {
-  setup.installAmdGraphics()
+  installer.installAmdGraphics()
 }
