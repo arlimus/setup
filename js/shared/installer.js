@@ -142,7 +142,7 @@ export const installArchCore = () => {
   packages(
     // basics
     'git', 'just', 'diff-so-fancy', 'curl', 'htop', 'p7zip', 'encfs', 'pwgen',
-    'openssh', 'sshfs', 'tree', 'net-tools', 'termdown', 'gdu', 'renameutils',
+    'openssh', 'sshfs', 'tree', 'net-tools', 'termdown', 'renameutils',
     'rclone', 'claude-code', 'openai-codex', 'github-cli',
     // deps for dev
     'base-devel', 'pnpm', 'python-pip',
@@ -153,7 +153,9 @@ export const installArchCore = () => {
     'bat', 'fzf', 'ripgrep',
     // productivity
     'go', 'imagemagick', 'graphicsmagick',
-    'code', 'meld', 'colordiff', 'httpie', 'protobuf', 'rsync',
+    'code', 'meld', 'colordiff', 'httpie', 'protobuf',
+    // files / drive
+    'gdu', 'rsync', 'gdrive',
     // audio config
     'pipewire', 'pavucontrol', 'rtkit', 'realtime-privileges',
     // video-tools
