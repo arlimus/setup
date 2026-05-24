@@ -144,6 +144,8 @@ export const installArchCore = () => {
     'git', 'just', 'diff-so-fancy', 'curl', 'htop', 'p7zip', 'encfs', 'pwgen',
     'openssh', 'sshfs', 'tree', 'net-tools', 'termdown', 'renameutils',
     'rclone', 'claude-code', 'openai-codex', 'github-cli',
+    // OS foundation
+    'zram-generator',
     // deps for dev
     'base-devel', 'pnpm', 'python-pip',
     // editor
@@ -172,6 +174,18 @@ export const installArchCore = () => {
     // comms
     'discord', 'slack-desktop', 'telegram-desktop',
   )
+
+  // out of memory protection, kills cgroups before the kernel locks up
+  run('sudo systemctl enable --now systemd-oomd')
+
+  // zram-swap: compressed in-RAM swap gives the kernel reclaim headroom so
+  // OOM can fire cleanly instead of stalling. The config is read by the
+  // zram-generator systemd-generator; no `systemctl enable` is needed -- the
+  // generated dev-zram0.swap unit is pulled into swap.target on every boot.
+  // daemon-reload reruns generators; start the unit so zram is live without
+  // requiring a reboot.
+  syncFiles('zram-generator.conf', '/etc/systemd/zram-generator.conf')
+    .changed(() => run('sudo systemctl daemon-reload && sudo systemctl start systemd-zram-setup@zram0.service'))
 
   ensureLines("/etc/locale.conf", "LANG=en_US.utf8")
   ensureLines("/etc/locale.gen", "en_US.UTF-8 UTF-8")
