@@ -187,6 +187,20 @@ export const installArchCore = () => {
   syncFiles('zram-generator.conf', '/etc/systemd/zram-generator.conf')
     .changed(() => run('sudo systemctl daemon-reload && sudo systemctl start systemd-zram-setup@zram0.service'))
 
+  // Disk swapfile as overflow for the rare case zram is exhausted (e.g. heavy
+  // Rust/C++ compiles on third-party projects whose -j we don't control).
+  // Priority 10 keeps it strictly below zram (100): kernel fills zram first,
+  // only spills here when zram is full. Assumes ext4; on btrfs use a different
+  // creation path (chattr +C / btrfs filesystem mkswapfile).
+  const swapfile = '/swapfile'
+  install(`swapfile ${swapfile}`, () => fs.existsSync(swapfile), () => run([
+    `sudo fallocate -l 16G ${swapfile}`,
+    `sudo chmod 600 ${swapfile}`,
+    `sudo mkswap ${swapfile}`,
+    `sudo swapon -p 10 ${swapfile}`,
+  ].join(' && ')))
+  ensureLines('/etc/fstab', `${swapfile} none swap defaults,pri=10 0 0`)
+
   ensureLines("/etc/locale.conf", "LANG=en_US.utf8")
   ensureLines("/etc/locale.gen", "en_US.UTF-8 UTF-8")
   run("sudo locale-gen")
