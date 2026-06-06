@@ -111,6 +111,9 @@ export GOPATH=/pub/go
 export GOBIN=/pub/go/bin
 export $(gnome-keyring-daemon -s)
 PATH=/pub/go/bin:$PATH
+
+env.nvm() { source ~/.zero.tools/env.nvm.sh; }
+
 alias b="bundle exec"
 alias ya="yt-dlp -f bestaudio --audio-quality 0 -i -x --extract-audio --no-playlist"
 alias yav="yt-dlp -f bestvideo+bestaudio --audio-quality 0 -i --merge-output-format mkv --no-playlist"
@@ -126,8 +129,6 @@ alias battery="cat /sys/class/power_supply/BAT0/capacity"
 alias cp="acp -gni "
 alias mv="amv -gni "
 alias cpforce="acp -f "
-
-alias evy="cd /pub/go/src/github.com/arlimus/evy && sudo go run main.go"
 
 alias btoff="rfkill block bluetooth"
 # add: ... && bluetoothctl connect AA:BB:CC:DD:EE:FF  <= your device
