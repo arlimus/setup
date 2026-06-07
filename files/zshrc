@@ -112,7 +112,6 @@ export GOBIN=/pub/go/bin
 export $(gnome-keyring-daemon -s)
 PATH=/pub/go/bin:$PATH
 
-env.nvm() { source ~/.zero.tools/env.nvm.sh; }
 
 alias b="bundle exec"
 alias ya="yt-dlp -f bestaudio --audio-quality 0 -i -x --extract-audio --no-playlist"

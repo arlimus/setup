@@ -304,7 +304,9 @@ export const installCore = () => {
     'cd '+toolsHome,
     'pnpm i',
     // and install
-    'sudo ln -s $(pwd)/env.nvm.sh /usr/local/bin/env.nvm',
+    // env.nvm is a tiny wrapper that prints the absolute path of env.nvm.sh,
+    // so callers can do `source $(env.nvm)` from any shell or standalone script.
+    'sudo ln -s $(pwd)/env.nvm /usr/local/bin/env.nvm',
     'sudo ln -s $(pwd)/normalize.names.js /usr/local/bin/normalize.names',
     'sudo ln -s $(pwd)/mextract.py /usr/local/bin/mextract',
     'sudo ln -s $(pwd)/yav.sh /usr/local/bin/yav',
