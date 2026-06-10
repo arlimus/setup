@@ -88,6 +88,32 @@ export const syncFile = (src, dst) => {
   const after = safeRead(dst)
   return syncChain(before == null || after == null || !before.equals(after))
 }
+// Flatten a directory tree into a list of paths relative to `root`. We sync
+// file-by-file (see syncFiles) instead of one recursive `cp -R`, so we need the
+// full leaf list up front to copy and diff each file on its own.
+const walkFiles = (root, rel = '') => {
+  const out = []
+  for(const e of fs.readdirSync(path.join(root, rel))) {
+    const r = path.join(rel, e)
+    if(fs.statSync(path.join(root, r)).isDirectory()) out.push(...walkFiles(root, r))
+    else out.push(r)
+  }
+  return out
+}
+
+// Copy a single file, creating parent dirs first. Files under $HOME go through
+// plain shelljs; anything outside (e.g. /usr/local, /etc) needs sudo. Splitting
+// this out keeps the file- and directory-sync paths using the exact same copy
+// logic, which is the whole point of "make sync files consistent".
+const cpFile = (srcp, dst) => {
+  if(dst.startsWith(os.homedir())) {
+    shell.mkdir('-p', path.dirname(dst))
+    return shell.cp(srcp, dst).code === 0
+  }
+  run(`sudo mkdir -p ${path.dirname(dst)}`)
+  return run(`sudo cp ${srcp} ${dst}`).code === 0
+}
+
 export const syncFiles = (src, dst) => {
   const srcp = path.join('files', src);
   if(!fs.existsSync(srcp)) {
@@ -95,18 +121,30 @@ export const syncFiles = (src, dst) => {
     return noopChain
   }
   console.log(`${srcp} -> ${dst}`)
-  shell.mkdir('-p', path.dirname(dst))
-  const srcIsFile = fs.statSync(srcp).isFile()
-  const before = srcIsFile ? safeRead(dst) : null
-  let ok
-  if(dst.startsWith(os.homedir()))
-    ok = shell.cp('-R', srcp, dst).code === 0
-  else
-    ok = run(`sudo cp ${srcp} ${dst}`).code === 0
-  if(!ok) return noopChain
-  if(!srcIsFile) return syncChain(true) // dir copies: assume changed
-  const after = safeRead(dst)
-  return syncChain(before == null || after == null || !before.equals(after))
+  if(fs.statSync(srcp).isFile()) {
+    const before = safeRead(dst)
+    if(!cpFile(srcp, dst)) return noopChain
+    const after = safeRead(dst)
+    return syncChain(before == null || after == null || !before.equals(after))
+  }
+  // Directory sync. The old code did a single `cp -R srcp dst`, which has two
+  // problems: (1) `cp -R` puts srcp *inside* dst when dst already exists, so
+  // re-running it nested the tree one level deeper each time — hence dst is the
+  // destination here, not a parent; (2) it couldn't tell whether anything had
+  // actually changed, so it always reported "changed" and re-ran every
+  // downstream sync step. Walking the tree and copying file-by-file (same code
+  // path as the single-file case) lets us byte-compare each file and report a
+  // change only when content really differs.
+  let anyChanged = false
+  for(const rel of walkFiles(srcp)) {
+    const s = path.join(srcp, rel)
+    const d = path.join(dst, rel)
+    const before = safeRead(d)
+    if(!cpFile(s, d)) return noopChain
+    const after = safeRead(d)
+    if(before == null || after == null || !before.equals(after)) anyChanged = true
+  }
+  return syncChain(anyChanged)
 }
 
 export const writeFile = (path, content) => {

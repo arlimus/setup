@@ -304,8 +304,11 @@ export const installCore = () => {
     'cd '+toolsHome,
     'pnpm i',
     // and install
-    // env.nvm is a tiny wrapper that prints the absolute path of env.nvm.sh,
-    // so callers can do `source $(env.nvm)` from any shell or standalone script.
+    // Symlink the env.nvm wrapper (not env.nvm.sh) onto the PATH. The wrapper
+    // just prints env.nvm.sh's path so callers `source $(env.nvm)` it into
+    // their own shell — symlinking the .sh directly would run `nvm use` in a
+    // throwaway subshell, leaving the caller's Node version unchanged. This
+    // also replaces the old zsh-only env.nvm() function from zshrc.
     'sudo ln -s $(pwd)/env.nvm /usr/local/bin/env.nvm',
     'sudo ln -s $(pwd)/normalize.names.js /usr/local/bin/normalize.names',
     'sudo ln -s $(pwd)/mextract.py /usr/local/bin/mextract',
