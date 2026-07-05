@@ -410,15 +410,17 @@ export const installDevEnv = (name, email) => {
     print.ok(`claude skill: ${name}`)
   }
   installClaudeSkill('youtube-summary')
+  installClaudeSkill('process-pr-comments')
 
-  // Permissions the youtube-summary skill needs (read its cache, save summaries,
-  // and run fetch.sh with any URL — the literal-string match would only cover
-  // one URL, so use the :* wildcard instead).
+  // Permissions the skills need (read its cache, save summaries, and run each
+  // fetch.sh with any argument — the literal-string match would only cover one
+  // set of args, so use the :* wildcard instead).
   const home = os.homedir()
   ensureClaudePermissions([
     `Read(${home}/.cache/claude-youtube-summary/**)`,
     `Write(${home}/.cache/youtube-summaries/**)`,
     `Bash(${home}/.claude/skills/youtube-summary/fetch.sh:*)`,
+    `Bash(${home}/.claude/skills/process-pr-comments/fetch.sh:*)`,
   ])
 
   ensureJson(path.join(os.homedir(), '.config/Code - OSS/User/settings.json'),
