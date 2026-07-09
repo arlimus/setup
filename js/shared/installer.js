@@ -313,6 +313,7 @@ export const installCore = () => {
     'sudo ln -s $(pwd)/normalize.names.js /usr/local/bin/normalize.names',
     'sudo ln -s $(pwd)/mextract.py /usr/local/bin/mextract',
     'sudo ln -s $(pwd)/yav.sh /usr/local/bin/yav',
+    'sudo ln -s $(pwd)/claude-sandbox.sh /usr/local/bin/claude-sandbox',
   ].join(' && '))
 }
 
