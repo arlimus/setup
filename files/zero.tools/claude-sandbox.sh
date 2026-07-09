@@ -44,10 +44,20 @@ if [ -d "$HOME/.claude" ]; then
   shopt -u dotglob nullglob
 fi
 
-# Only mount .claude.json if we actually seeded it, otherwise Docker would
-# create a *directory* at that path and claude would choke on it.
+# Only mount each source we actually have -- otherwise Docker would create an
+# empty *directory* at the mount path (e.g. turning .claude.json into a dir),
+# which claude would choke on.
 config_mounts=( -v "$scratch/.claude:/home/claude/.claude" )
 [ -f "$scratch/.claude.json" ] && config_mounts+=( -v "$scratch/.claude.json:/home/claude/.claude.json" )
+
+# git identity (~/.gitconfig) and GitHub CLI auth (~/.config/gh): git is
+# read-only in here (the image blocks add/commit/push -- see git-guard), so the
+# gitconfig is just for inspecting history, and gh for looking things up. Both
+# only ever *read* these files, so mount them read-only straight from the host:
+# no token copied into the scratch dir, and the sandbox can't mutate your real
+# git/gh config either.
+[ -f "$HOME/.gitconfig" ] && config_mounts+=( -v "$HOME/.gitconfig:/home/claude/.gitconfig:ro" )
+[ -d "$HOME/.config/gh" ] && config_mounts+=( -v "$HOME/.config/gh:/home/claude/.config/gh:ro" )
 
 docker run -it --rm \
   "${config_mounts[@]}" \

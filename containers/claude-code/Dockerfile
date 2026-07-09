@@ -1,6 +1,28 @@
 # Use Node.js 22 Active LTS base image
 FROM node:22-slim
 
+# git + GitHub CLI: claude leans on both heavily when working in repos. git is a
+# plain apt package; gh isn't in Debian's default repos, so pull it from
+# GitHub's official apt repository (keyring + signed-by source).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates curl git \
+    && mkdir -p -m 755 /etc/apt/keyrings \
+    && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+         -o /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+         > /etc/apt/sources.list.d/github-cli.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends gh \
+    && rm -rf /var/lib/apt/lists/*
+
+# Read-only git guardrail: shadow the real git (/usr/bin/git) with a wrapper on
+# /usr/local/bin (which precedes /usr/bin on PATH). claude may inspect the repo
+# but `git add`/`commit`/`push` are refused -- the sandbox never mutates or
+# publishes history. See git-guard for the passthrough logic.
+COPY git-guard /usr/local/bin/git
+RUN chmod +x /usr/local/bin/git
+
 # Install Claude Code CLI globally via npm
 RUN npm install -g @anthropic-ai/claude-code
 

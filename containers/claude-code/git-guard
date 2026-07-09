@@ -1,0 +1,36 @@
+#!/bin/sh
+# Read-only git guardrail for the claude sandbox.
+#
+# claude may inspect the repo (log, diff, status, show, blame, ...) but must not
+# mutate it or publish: `git add`, `git commit`, and `git push` are refused.
+# Everything else is passed through to the real git at /usr/bin/git.
+#
+# We look past git's leading global options (`-C dir`, `-c k=v`, `--git-dir=`,
+# etc.) so `git -C some/path commit` is caught, not just a bare `git commit`.
+
+real_git=/usr/bin/git
+
+sub=""
+skip_next=0
+for arg in "$@"; do
+  if [ "$skip_next" = 1 ]; then skip_next=0; continue; fi
+  case "$arg" in
+    # global options that consume the following argument
+    -C|-c|--git-dir|--work-tree|--namespace|--super-prefix|--config-env|--exec-path)
+      skip_next=1 ;;
+    # any other leading option (with or without an attached value) -> skip
+    -*) ;;
+    # first non-option token is the subcommand
+    *) sub="$arg"; break ;;
+  esac
+done
+
+case "$sub" in
+  add|commit|push)
+    echo "git $sub is disabled in the claude sandbox (read-only repo access)." >&2
+    echo "Inspect freely (log/diff/status/show), but committing and pushing are off." >&2
+    exit 1
+    ;;
+esac
+
+exec "$real_git" "$@"
