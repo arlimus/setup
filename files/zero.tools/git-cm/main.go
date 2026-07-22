@@ -26,6 +26,7 @@ var commitTypes = []commitType{
 	{"🍉", "ui feature (melon)"},
 	{"🌈", "ux / design (rainbow)"},
 	{"🏇", "speed / race condition (horse)"},
+	{"🎉", "release (tada)"},
 	{"🛑", "breaking feature (stop)"},
 	{"🟢", "get tests green"},
 	{"🍫", "examples (choco)"},
