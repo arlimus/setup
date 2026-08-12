@@ -29,6 +29,7 @@ var commitTypes = []commitType{
 	{"🎉", "release (tada)"},
 	{"🛑", "breaking feature (stop)"},
 	{"🟢", "get tests green"},
+	{"⚒️", "tools"},
 	{"🍫", "examples (choco)"},
 	{"📃", "docs"},
 	{"🤖", "ai / llm (robot)"},
