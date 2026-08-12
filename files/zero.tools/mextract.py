@@ -10,6 +10,8 @@ def trackinfo2mkvextract(track, file):
     codec = track["codec"]
     match track["type"]:
         case "video":
+            if codec == "V_MJPEG":
+                return ""
             return id+":"+file+"."+id+".mkv"
         case "audio":
             return id+":"+file+"."+id+".ogg"
@@ -31,6 +33,7 @@ for file in files:
     info = json.loads(res.stdout)
 
     tracks = list(map(lambda x: trackinfo2mkvextract(x, file), info["tracks"]))
+    tracks = [x for x in tracks if x != ""]
     cli = ["mkvextract", file, "tracks"] + tracks
     print(" ".join(cli))
     res = subprocess.run(cli, capture_output=True, text=True)
