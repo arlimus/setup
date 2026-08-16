@@ -224,7 +224,7 @@ export const installArchCore = () => {
   syncFiles('69-language-selector-ja.conf', path.join(os.homedir(), '.config/fontconfig/conf.d/69-language-selector-ja.conf'))
     .changed(() => run('fc-cache -fr'))
 
-  syncFiles('obstoggle', '/usr/local/bin/obstoggle')
+  syncFiles('obsdo', '/usr/local/bin/obsdo')
 }
 
 export const configureZsh = () => {

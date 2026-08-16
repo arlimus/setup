@@ -1,2 +1,0 @@
-#!/bin/bash
-obs-cmd --websocket obsws://localhost:4455/PASSWORD recording toggle
