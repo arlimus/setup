@@ -8,14 +8,18 @@
 #       Record a baseline of files that already have uncommitted changes.
 #       Run once before editing anything. Those files can't be committed later.
 #   commit.sh commit [-m BODY] -- FILE...
-#       Stage exactly FILE... and commit them as "🟢 reviewer feedback".
+#       Stage FILE... and commit them as "🟢 reviewer feedback", together with
+#       whatever the user already staged (their staging is an instruction to
+#       include it).
 #       BODY is optional: at most 3 lines, each at most 72 characters.
-#
-# The script never pushes.
+#   commit.sh push
+#       Push the current branch to its upstream, fast-forward only. Refuses
+#       unless every unpushed commit is a "🟢 reviewer feedback" commit, so
+#       it never publishes the user's own unpushed work.
 set -euo pipefail
 
 TITLE="🟢 reviewer feedback"
-TRAILER="Co-Authored-By: Claude <noreply@anthropic.com>"
+TRAILER=""
 MAX_BODY_LINES=3
 MAX_LINE_LEN=72
 
@@ -30,7 +34,11 @@ dirty_paths() {
   git status --porcelain=v1 -z --untracked-files=all | while IFS= read -r -d '' entry; do
     printf '%s\n' "${entry:3}"
     # renames/copies carry the original path as an extra NUL-separated field
-    [[ "${entry:0:1}" == [RC] ]] && IFS= read -r -d '' orig && printf '%s\n' "$orig"
+    # an if, not `&&`: a false test as the body's last command would make the loop (and,
+    # under pipefail, every caller's command substitution) fail on any non-rename entry
+    if [[ "${entry:0:1}" == [RC] ]]; then
+      IFS= read -r -d '' orig && printf '%s\n' "$orig"
+    fi
   done
 }
 
@@ -39,6 +47,22 @@ cmd_begin() {
   local n; n="$(grep -c . "$BASELINE" || true)"
   echo "Baseline recorded: $n file(s) with pre-existing changes (off-limits for commit)."
   [[ "$n" -gt 0 ]] && sed 's/^/  /' "$BASELINE"
+  return 0
+}
+
+# require_branch sets `branch` to the current branch and refuses detached HEAD,
+# the default branch, and in-progress merges/rebases/cherry-picks.
+require_branch() {
+  local action="$1"
+  branch="$(git symbolic-ref --quiet --short HEAD)" || die "detached HEAD; refusing to $action."
+  case "$branch" in main|master) die "on '$branch'; refusing to $action the default branch." ;; esac
+  local default
+  default="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null || true)"
+  [[ -n "$default" && "$branch" == "${default#origin/}" ]] && die "on default branch '$branch'; refusing."
+  for f in MERGE_HEAD REBASE_HEAD CHERRY_PICK_HEAD REVERT_HEAD; do
+    [[ -e "$GIT_DIR/$f" ]] && die "a merge/rebase/cherry-pick is in progress; refusing."
+  done
+  [[ -d "$GIT_DIR/rebase-merge" || -d "$GIT_DIR/rebase-apply" ]] && die "a rebase is in progress; refusing."
   return 0
 }
 
@@ -55,18 +79,8 @@ cmd_commit() {
 
   [[ -f "$BASELINE" ]] || die "no baseline. Run 'commit.sh begin' before editing files."
 
-  # branch / repo state
   local branch
-  branch="$(git symbolic-ref --quiet --short HEAD)" || die "detached HEAD; refusing to commit."
-  case "$branch" in main|master) die "on '$branch'; refusing to commit to the default branch." ;; esac
-  local default
-  default="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null || true)"
-  [[ -n "$default" && "$branch" == "${default#origin/}" ]] && die "on default branch '$branch'; refusing."
-  for f in MERGE_HEAD REBASE_HEAD CHERRY_PICK_HEAD REVERT_HEAD; do
-    [[ -e "$GIT_DIR/$f" ]] && die "a merge/rebase/cherry-pick is in progress; refusing."
-  done
-  [[ -d "$GIT_DIR/rebase-merge" || -d "$GIT_DIR/rebase-apply" ]] && die "a rebase is in progress; refusing."
-  git diff --cached --quiet || die "the index already has staged changes; refusing to mix them in."
+  require_branch "commit to"
 
   # message body
   if [[ -n "$body" ]]; then
@@ -92,17 +106,55 @@ cmd_commit() {
   done
 
   local msg; msg="$(mktemp)"
-  trap 'rm -f "$msg"' EXIT
+  # expanded now: `msg` is local and gone by the time the EXIT trap runs under `set -u`
+  trap "rm -f '$msg'" EXIT
   { echo "$TITLE"; [[ -n "$body" ]] && printf '\n%s\n' "$body"; printf '\n%s\n' "$TRAILER"; } > "$msg"
 
   cd "$ROOT"
   git add -- "${files[@]}"
-  git commit --quiet -F "$msg" -- "${files[@]}"
+  git commit --quiet -F "$msg"
   git log -1 --stat --format='committed %h on '"$branch"'%n%n%B'
+}
+
+cmd_push() {
+  [[ $# -eq 0 ]] || die "push takes no arguments."
+  local branch
+  require_branch "push"
+
+  # only the branch's own upstream, under the same name: no new remote branches
+  local remote merge
+  remote="$(git config --get "branch.$branch.remote" || true)"
+  merge="$(git config --get "branch.$branch.merge" || true)"
+  [[ -n "$remote" && -n "$merge" ]] || die "'$branch' has no upstream; push it yourself the first time."
+  [[ "$remote" != "." ]] || die "'$branch' tracks a local branch; refusing."
+  [[ "$merge" == "refs/heads/$branch" ]] || die "'$branch' tracks '$remote/${merge#refs/heads/}', a different name; refusing."
+  local upstream="$remote/$branch"
+
+  git fetch --quiet "$remote" "$merge" || die "could not fetch '$upstream'."
+  git rev-parse --verify --quiet "refs/remotes/$upstream" >/dev/null || die "no remote-tracking ref for '$upstream'."
+
+  local behind
+  behind="$(git rev-list --count "HEAD..refs/remotes/$upstream")"
+  [[ "$behind" -eq 0 ]] || die "'$upstream' has $behind commit(s) not in '$branch'; integrate them yourself first."
+
+  local c commits=() foreign=()
+  while IFS= read -r c; do commits+=("$c"); done < <(git rev-list --reverse "refs/remotes/$upstream..HEAD")
+  [[ ${#commits[@]} -gt 0 ]] || die "nothing to push; '$branch' matches '$upstream'."
+  for c in "${commits[@]}"; do
+    [[ "$(git log -1 --format=%s "$c")" == "$TITLE" ]] || foreign+=("  $(git log -1 --format='%h %s' "$c")")
+  done
+  [[ ${#foreign[@]} -eq 0 ]] || die "unpushed commits that aren't reviewer feedback; push them yourself:
+$(printf '%s\n' "${foreign[@]}")"
+
+  # explicit refspec (ignores push.default); no force, so a moved remote is rejected
+  git push --quiet "$remote" "HEAD:$merge"
+  echo "pushed ${#commits[@]} commit(s) to $upstream:"
+  for c in "${commits[@]}"; do git log -1 --format='  %h %s' "$c"; done
 }
 
 case "${1:-}" in
   begin) shift; cmd_begin "$@" ;;
   commit) shift; cmd_commit "$@" ;;
-  *) die "usage: commit.sh begin | commit.sh commit [-m BODY] -- FILE..." ;;
+  push) shift; cmd_push "$@" ;;
+  *) die "usage: commit.sh begin | commit.sh commit [-m BODY] -- FILE... | commit.sh push" ;;
 esac

@@ -118,15 +118,25 @@ Commit once all actionable items are done. Skip committing if a decision is stil
 
 - The title is always `🟢 reviewer feedback`, and the script sets it. Don't try to change it.
 - `-m` is optional: at most 3 lines, 72 chars each. Say what changed in a few words (e.g. `handle nil config in loader; rename fooBar -> fooBaz`). No per-comment transcript.
-- List **only** the files you edited while processing this feedback, each explicitly. No `.`, directories, or globs; the script rejects them. It also refuses files from the `begin` baseline, anything already staged, the default branch, and detached HEAD.
+- List **only** the files you edited while processing this feedback, each explicitly. No `.`, directories, or globs; the script rejects them. It also refuses files from the `begin` baseline, the default branch, and detached HEAD.
+- Anything the user already staged is committed too — staging is their instruction to include it. Never unstage it, and never ask them to.
 - If the script refuses, report its message verbatim and stop. Don't work around it.
-- Never push. Pushing stays with the user.
+
+Once the commit succeeds, **push right away, without asking**. Invoking this skill is the user's standing authorization to push its own feedback commits. Use the wrapper; raw `git push` is denied:
+
+```bash
+/home/zero/.claude/skills/process-pr-comments/commit.sh push
+```
+
+It pushes the current branch to its upstream under the same name, fast-forward only, and never forces. It refuses when the branch has no upstream, the remote has commits the branch lacks, or any unpushed commit isn't a `🟢 reviewer feedback` commit (so it can't publish the user's own unpushed work). If it refuses, report its message verbatim and stop.
 
 ## Step 6: Report, and offer to reply / resolve
 
-Summarize: for each item — **done** (with the file:line changed), **answered** (with the answer), **skipped** (with why), or **needs-decision**. Include the commit hash, if any.
+Summarize: for each item — **done** (with the file:line changed), **answered** (with the answer), **skipped** (with why), or **needs-decision**. Include the commit hash and whether it was pushed.
 
-Replying and resolving threads are outward-facing — **confirm before doing either** unless the user already told you to. When the user asks, use:
+Replying and resolving threads are outward-facing — **confirm before doing either** unless the user already told you to. Only reply "fixed" on a thread once the push has succeeded, so the reply points at code the reviewer can see.
+
+For replies and resolving, when the user asks, use:
 
 ```bash
 # Reply to an inline thread (reply_to = the comment id from REVIEW_THREADS):
