@@ -41,11 +41,13 @@ It prints these sections to stdout:
 
 If the script exits non-zero (not in a repo, not authenticated, no PR on the branch), report the message verbatim and stop.
 
-Then, **before editing any file**, record the baseline of pre-existing uncommitted changes (again, invoke it bare):
+Then, **before editing any file**, verify the checkout and record the baseline of pre-existing uncommitted changes. Pass the PR number from the `### PR` section (again, invoke it bare):
 
 ```bash
-/home/zero/.claude/skills/process-pr-comments/commit.sh begin
+/home/zero/.claude/skills/process-pr-comments/commit.sh begin <pr-number>
 ```
+
+It refuses unless the PR is open, the current branch is the PR's head branch, that branch tracks the same-named branch in the PR's head repo, the remote branch is at the PR's head commit, and the local branch isn't behind it. If it refuses, report its message verbatim and stop. Don't edit anything, and don't switch branches or pull on your own.
 
 Files it lists were already dirty before you started. They are the user's work in progress: don't edit them unless a comment requires it, and never commit them (the script refuses). If a fix has to touch one, say so, and leave committing that file to the user.
 
@@ -118,7 +120,7 @@ Commit once all actionable items are done. Skip committing if a decision is stil
 
 - The title is always `🟢 reviewer feedback`, and the script sets it. Don't try to change it.
 - `-m` is optional: at most 3 lines, 72 chars each. Say what changed in a few words (e.g. `handle nil config in loader; rename fooBar -> fooBaz`). No per-comment transcript.
-- List **only** the files you edited while processing this feedback, each explicitly. No `.`, directories, or globs; the script rejects them. It also refuses files from the `begin` baseline, the default branch, and detached HEAD.
+- List **only** the files you edited while processing this feedback, each explicitly. No `.`, directories, or globs; the script rejects them. It also refuses files from the `begin` baseline, a branch other than the one `begin` verified, the default branch, and detached HEAD.
 - Anything the user already staged is committed too — staging is their instruction to include it. Never unstage it, and never ask them to.
 - If the script refuses, report its message verbatim and stop. Don't work around it.
 
@@ -128,7 +130,7 @@ Once the commit succeeds, **push right away, without asking**. Invoking this ski
 /home/zero/.claude/skills/process-pr-comments/commit.sh push
 ```
 
-It pushes the current branch to its upstream under the same name, fast-forward only, and never forces. It refuses when the branch has no upstream, the remote has commits the branch lacks, or any unpushed commit isn't a `🟢 reviewer feedback` commit (so it can't publish the user's own unpushed work). If it refuses, report its message verbatim and stop.
+It re-checks the PR (still open, same head branch and repo, remote still at the PR head) and then pushes the current branch to its upstream under the same name, fast-forward only, and never forces. It refuses when the branch has no upstream, the remote has commits the branch lacks, or any unpushed commit isn't a `🟢 reviewer feedback` commit (so it can't publish the user's own unpushed work). If it refuses, report its message verbatim and stop.
 
 ## Step 6: Report, and offer to reply / resolve
 
