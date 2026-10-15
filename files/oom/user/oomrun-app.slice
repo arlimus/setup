@@ -1,0 +1,4 @@
+# App tier: dev servers, chat apps. No limits; oomrun gives these
+# oom_score_adj 500 so both oomd and the kernel kill them before builds.
+[Unit]
+Description=oomrun app tier (killed before builds)

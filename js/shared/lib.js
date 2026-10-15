@@ -162,9 +162,9 @@ const readFile = (path, alternative = null) => {
 }
 
 export const ensureLines = (path, ...lines) => {
-  cl = readFile(path, '').split(/\r?\n/).map(x => x.trim())
+  const cl = readFile(path, '').split(/\r?\n/).map(x => x.trim())
 
-  changed = false;
+  let changed = false;
   lines.forEach(line => {
     if(!cl.includes(line)) {
       cl.push(line)
@@ -174,7 +174,7 @@ export const ensureLines = (path, ...lines) => {
   })
 
   if(changed) {
-    res = cl.join("\n")
+    let res = cl.join("\n")
     if(!res.endsWith("\n")) res += "\n"
     writeFile(path, res)
   }
@@ -218,6 +218,7 @@ export const ensureClaudePermissions = (allowEntries) => {
 }
 
 export const ensureJson = (path, j) => {
+  let c, org
   try {
     c = readFile(path, '')
     org = JSON.parse(c)
@@ -236,8 +237,8 @@ export const ensureJson = (path, j) => {
     })
   }
 
-  for(key in j) org[key] = j[key]
-  res = JSON.stringify(org, null, 2)
+  for(const key in j) org[key] = j[key]
+  const res = JSON.stringify(org, null, 2)
   install(`json ${path}`, () => c !== res, () => writeFile(path, res))
 }
 

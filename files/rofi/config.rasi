@@ -10,6 +10,9 @@ configuration {
 
   modi: "combi,window,run,ssh";
   combi-modi: "window,drun,ssh";
+  // launch apps in their oomrun memory tier (browser capped, rest killable
+  // before builds) instead of inside sway's session cgroup
+  run-command: "oomrun auto {cmd}";
 
   show-icons: true;
   font: "Inconsolata 16";

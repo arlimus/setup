@@ -1,0 +1,12 @@
+# Browser tier: capped. Above MemoryHigh the browser is reclaimed into zram
+# first; at MemoryMax the kernel OOM-kills inside this slice only, picking a
+# tab (Firefox gives content processes oom_score_adj 133-200). systemd-oomd
+# never picks it: it can't grow past its cap, and killing it kills everything.
+[Unit]
+Description=oomrun browser tier (killed first, tab by tab)
+
+[Slice]
+MemoryHigh=30%
+MemoryMax=35%
+MemorySwapMax=10%
+ManagedOOMPreference=omit

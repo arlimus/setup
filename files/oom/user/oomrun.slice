@@ -1,0 +1,8 @@
+# Parent of the oomrun tiers. memory.low only protects as deep as every
+# ancestor allows, so this (and user.slice / user-.slice / user@.service)
+# carries the build tier's protection down to oomrun-build.slice.
+[Unit]
+Description=oomrun memory tiers
+
+[Slice]
+MemoryLow=25%

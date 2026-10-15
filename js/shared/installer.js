@@ -175,8 +175,7 @@ export const installArchCore = () => {
     'discord', 'slack-desktop', 'telegram-desktop',
   )
 
-  // out of memory protection, kills cgroups before the kernel locks up
-  run('sudo systemctl enable --now systemd-oomd')
+  configureOomProtection()
 
   // zram-swap: compressed in-RAM swap gives the kernel reclaim headroom so
   // OOM can fire cleanly instead of stalling. The config is read by the
@@ -227,6 +226,60 @@ export const installArchCore = () => {
   syncFiles('obsdo', '/usr/local/bin/obsdo')
 }
 
+// Out of memory protection. Without it, a large build pushes the system into
+// swap thrashing and the UI freezes for minutes before the kernel OOM killer
+// finally acts. Kill order, first to last:
+//   1. browser tabs   (capped oomrun-browser.slice, kernel kills a tab inside)
+//   2. apps/servers   (oomrun app: oom_score_adj 500, oomd candidates)
+//   3. builds         (oomrun build: MemoryLow + oomd avoid)
+//   4. sway session   (MemoryMin + oomd omit)
+// Arch ships systemd-oomd without any monitored cgroups, so just enabling it
+// does nothing; the drop-ins below opt cgroups in.
+const configureOomProtection = () => {
+  // Reload once at the end: restarting oomd per changed file trips systemd's
+  // start rate limit.
+  let systemChanged = false
+  const markChanged = () => { systemChanged = true }
+  syncFiles('oom/oomd.conf', '/etc/systemd/oomd.conf.d/oomrun.conf').changed(markChanged)
+  const dropins = {
+    'root.slice.conf': '-.slice.d',
+    'user.slice.conf': 'user.slice.d',
+    'user@.service.conf': 'user@.service.d',
+    'session-.scope.conf': 'session-.scope.d',
+  }
+  for(const [src, dir] of Object.entries(dropins))
+    syncFiles(`oom/system/${src}`, `/etc/systemd/system/${dir}/10-oomrun.conf`).changed(markChanged)
+  // user-1000.slice sits between user.slice and the session/user@ cgroups;
+  // protection must be granted at every level to reach the leaves.
+  syncFiles('oom/system/user.slice.conf', '/etc/systemd/system/user-.slice.d/10-oomrun.conf').changed(markChanged)
+  if(systemChanged) run('sudo systemctl daemon-reload && sudo systemctl reset-failed systemd-oomd; sudo systemctl restart systemd-oomd')
+  run('sudo systemctl enable --now systemd-oomd')
+
+  syncFiles('oom/sysctl.conf', '/etc/sysctl.d/90-oomrun.conf')
+    .changed(() => run('sudo sysctl --load /etc/sysctl.d/90-oomrun.conf'))
+  syncFiles('oom/mglru.tmpfiles.conf', '/etc/tmpfiles.d/mglru-min-ttl.conf')
+    .changed(() => run('sudo systemd-tmpfiles --create /etc/tmpfiles.d/mglru-min-ttl.conf'))
+
+  syncFiles('oom/oomrun.sh', '/usr/local/bin/oomrun')
+  syncFiles('oom/hooks.zsh', path.join(os.homedir(), '.config/oomrun/hooks.zsh'))
+  syncFiles('oom/user', path.join(os.homedir(), '.config/systemd/user'))
+    .changed(() => run('systemctl --user daemon-reload'))
+
+  // Firefox unloads tabs itself once MemAvailable drops below this share of
+  // RAM (default 5%, i.e. only once the system is already stalling).
+  const ffDir = path.join(os.homedir(), '.mozilla/firefox')
+  const ffIni = safeReadText(path.join(ffDir, 'profiles.ini'))
+  const ffProfile = ffIni && /^\[Install[^\]]*\][^[]*?^Default=(.+)$/m.exec(ffIni)
+  if(ffProfile) {
+    ensureLines(path.join(ffDir, ffProfile[1].trim(), 'user.js'),
+      'user_pref("browser.tabs.unloadOnLowMemory", true);',
+      'user_pref("browser.low_commit_space_threshold_percent", 15);',
+    )
+  }
+}
+
+const safeReadText = (p) => fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : null
+
 export const configureZsh = () => {
   packages('zsh')
 
@@ -245,7 +298,7 @@ export const configureZsh = () => {
   let c = fs.readFileSync(zshrc, 'utf-8')
   c = c.replace(/ZSH_THEME=.*/, 'ZSH_THEME="zero-dark"')
   c = c.replace(/^plugins=\((.+[\s\S])+\)/m, 'plugins=(git zero)')
-  ensure = x => { if(!c.includes(x)) c += "\n"+x; }
+  const ensure = x => { if(!c.includes(x)) c += "\n"+x; }
 
   ensure('export GTK_IM_MODULE=fcitx')
   ensure('export QT_IM_MODULE=fcitx')
@@ -264,6 +317,8 @@ export const configureZsh = () => {
   ensure('v2mp4() { ffmpeg -i "$1" -c:v libx264 -c:a copy "$1".mp4 }')
   ensure('alias mpvs="mpv --speed=2.5 -af=scaletempo=stride=16:overlap=.68:search=20"')
   ensure('alias battery="cat /sys/class/power_supply/BAT0/capacity"')
+  // route `go build`, `make serve` etc. into their oomrun memory tier
+  ensure('[ -f ~/.config/oomrun/hooks.zsh ] && source ~/.config/oomrun/hooks.zsh')
   fs.writeFileSync(zshrc, c)
 }
 

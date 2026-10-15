@@ -1,0 +1,8 @@
+# Build tier: protected. MemoryLow makes the kernel reclaim from everything
+# else first; oomd only picks these once no other candidate is left.
+[Unit]
+Description=oomrun build tier (killed last)
+
+[Slice]
+MemoryLow=25%
+ManagedOOMPreference=avoid
