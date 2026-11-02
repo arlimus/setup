@@ -6,7 +6,7 @@
 Description=oomrun browser tier (killed first, tab by tab)
 
 [Slice]
-MemoryHigh=30%
-MemoryMax=35%
+MemoryHigh=20%
+MemoryMax=25%
 MemorySwapMax=10%
 ManagedOOMPreference=omit

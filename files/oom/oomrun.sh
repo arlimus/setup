@@ -5,8 +5,9 @@
 #
 #   oomrun browser firefox         capped slice: tabs are OOM-killed inside it,
 #                                  the rest of the system never notices
-#   oomrun app make serve          oom_score_adj 500: killed before builds
-#   oomrun build go build ./...    protected (MemoryLow, oomd avoid): last
+#   oomrun app make serve          oomd's regular target: killed before builds
+#   oomrun build go build ./...    protected (MemoryLow, oomd avoid): killed
+#                                  last, alongside terminal windows
 #   oomrun auto <cmd>              browser for known browsers, else app (rofi)
 #
 # Each launch becomes its own transient scope (oomrun-<tier>-<cmd>-<pid>.scope)
@@ -31,6 +32,12 @@ fi
 
 # OOMPolicy=continue on the browser: a kernel OOM kill inside its capped slice
 # takes out one tab process; the default policy would then stop all of Firefox.
+# systemd-oomd ignores oom_score_adj (it only honors ManagedOOMPreference);
+# adj only steers the kernel OOM killer, which otherwise picks the largest
+# process, i.e. the compiler. Unprivileged we can only raise it, so apps go
+# up instead of builds going down. Not the browser: Firefox sets its tabs to
+# 133-200 itself and couldn't lower them below a raised parent, so at the cap
+# the kernel would pick the main process and take all of Firefox down.
 case "$tier" in
   browser) adj=0;   pref=omit;  policy=continue ;;
   app)     adj=500; pref=none;  policy=stop ;;

@@ -230,9 +230,11 @@ export const installArchCore = () => {
 // swap thrashing and the UI freezes for minutes before the kernel OOM killer
 // finally acts. Kill order, first to last:
 //   1. browser tabs   (capped oomrun-browser.slice, kernel kills a tab inside)
-//   2. apps/servers   (oomrun app: oom_score_adj 500, oomd candidates)
-//   3. builds         (oomrun build: MemoryLow + oomd avoid)
+//   2. apps/servers   (oomrun app: oomd's regular candidates)
+//   3. builds and terminal windows (MemoryLow / oomd avoid): a terminal is
+//      protected like a build because killing it kills the build it drives
 //   4. sway session   (MemoryMin + oomd omit)
+// systemd-oomd ignores oom_score_adj; only ManagedOOMPreference orders it.
 // Arch ships systemd-oomd without any monitored cgroups, so just enabling it
 // does nothing; the drop-ins below opt cgroups in.
 const configureOomProtection = () => {

@@ -1,5 +1,7 @@
-# Build tier: protected. MemoryLow makes the kernel reclaim from everything
-# else first; oomd only picks these once no other candidate is left.
+# Build tier: protected, but not immune. MemoryLow makes the kernel reclaim
+# from everything else first; oomd "avoid" puts builds in the last tier
+# together with terminal windows (kitty-.scope.d), so oomd only picks one
+# once no app or dev server is left, e.g. two big builds at once.
 [Unit]
 Description=oomrun build tier (killed last)
 

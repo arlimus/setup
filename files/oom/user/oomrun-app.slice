@@ -1,4 +1,6 @@
-# App tier: dev servers, chat apps. No limits; oomrun gives these
-# oom_score_adj 500 so both oomd and the kernel kill them before builds.
+# App tier: dev servers (nextjs, make serve), chat apps. No limits and no
+# ManagedOOMPreference, so these are what systemd-oomd kills first; builds
+# and terminals are "avoid". oomrun also gives them oom_score_adj 500 for the
+# kernel OOM killer (oomd ignores adj).
 [Unit]
 Description=oomrun app tier (killed before builds)
